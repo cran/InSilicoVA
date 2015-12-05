@@ -1,0 +1,28 @@
+# exportPattern("^[[:alpha:]]+")
+
+export(insilico)
+export(physician_debias)
+export(csmf.diag)
+
+#export(plot.insilico)
+#export(print.insilico)
+#export(summary.insilico)
+#export(print.insilico_summary)
+
+#export(SampleInput_insilico)
+#export(condprob)
+#export(InsilicoVA-package)
+#export(probbase)
+#export(causetext)
+
+import("rJava")
+import("coda")
+import("ggplot2")
+importFrom("stats", "median", "quantile", "rbinom", "reorder", "runif")
+importFrom("utils", "write.csv")
+
+S3method("print","insilico")
+S3method("plot","insilico")
+S3method("summary","insilico")
+S3method("print","insilico_summary")
+
