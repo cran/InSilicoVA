@@ -4,15 +4,12 @@
 \title{100 records of Sample Input}
 \format{100 arbitrary input records.}
 \description{
-This is a  dataset consisting of 100 arbitrary sample input 
-deaths in the acceptable format of InSilicoVA. It is in the
-format of a list. The first element of the list is the matrix
-data input file in InterVA format, while the second is a vector
-of length 100 specifying subpopulation for the 100 deaths.
+This is a  dataset consisting of 1000 arbitrary sample input 
+deaths in the default format of InSilicoVA, i.e., the same input format as in InterVA-4 software and R package. 
 }
 \examples{
 data(RandomVA1)
-dim(RandomVA1$data)
-dim(RandomVA1$subpop)
+dim(RandomVA1)
+head(RandomVA1)
 }
 \keyword{datasets}

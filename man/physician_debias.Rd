@@ -5,7 +5,7 @@
 \title{Implement physician debias algorithm}
 \usage{
 physician_debias(data, phy.id, phy.code, phylist, causelist, tol = 1e-04,
-  max.itr = 5000)
+  max.itr = 5000, verbose = FALSE)
 }
 \arguments{
 \item{data}{The original data to be used. It is suggested to use similar
@@ -32,6 +32,8 @@ codes should be symptoms.}
 \item{tol}{tolerance of the EM algorithm}
 
 \item{max.itr}{maximum iteration to run}
+
+\item{verbose}{logical indicator for printing out likelihood change}
 }
 \value{
 \item{code.debias}{Individual cause likelihood distribution}

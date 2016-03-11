@@ -2,9 +2,9 @@
 print.insilico <- function(x,...){
 	cat("InSilicoVA fitted object:\n")
 	cat(paste(length(x$id), "death processed\n"))
-	cat(paste(x$length.sim, "iterations performed, with first", 
+	cat(paste(x$Nsim, "iterations performed, with first", 
 			  x$burnin, "iterations discarded\n",
-			  trunc((x$length.sim - x$burnin)/x$thin), "iterations saved after thinning\n"))
+			  trunc((x$Nsim - x$burnin)/x$thin), "iterations saved after thinning\n"))
 		if(x$useProbbase){
 			cat("Fitted with InterVA4 conditional probability matrix\n")
 		}else if(x$keepProbbase.level){

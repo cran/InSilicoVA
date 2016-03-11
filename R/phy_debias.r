@@ -23,6 +23,7 @@
 #' @param causelist vector of causes used in physician code columns
 #' @param tol tolerance of the EM algorithm
 #' @param max.itr maximum iteration to run
+#' @param verbose logical indicator for printing out likelihood change
 
 #' @return \item{code.debias}{Individual cause likelihood distribution}
 #' @return \item{csmf}{Cause specific distribution in the sample}
@@ -48,7 +49,7 @@
 #' analysis of online media}. \cr \emph{In Algorithms from and for Nature and 
 #' Life, pages 137-145, Springer.}
 #' 
-physician_debias <- function(data, phy.id, phy.code, phylist, causelist, tol = 0.0001, max.itr = 5000){
+physician_debias <- function(data, phy.id, phy.code, phylist, causelist, tol = 0.0001, max.itr = 5000, verbose = FALSE){
 	# which columns are doctor ID
 	docCol <- match(phy.id, colnames(data))
 	causeCol <- match(phy.code, colnames(data))
@@ -245,9 +246,14 @@ physician_debias <- function(data, phy.id, phy.code, phylist, causelist, tol = 0
 	  	diff <- diff.lik
 	  }
 	  
-	  cat(paste("itr",index, 
+	  if(verbose){
+		  cat(paste("itr",index, 
 	  			"loglik diff:",round(diff.lik, 4),
 	  			"Parameter diff:", round(diff, 4), "\n"))
+	  }else{
+	  	cat(".")
+	  }
+	  
 	  diff <- max(abs(diff), abs(diff.lik))    
 	  index<-index+1
 	}
@@ -261,7 +267,9 @@ physician_debias <- function(data, phy.id, phy.code, phylist, causelist, tol = 0
 		colnames(Pi.hat[[i]]) <- rownames(Pi.hat[[i]]) <- causelist
 	}
 
-	final <- list(code.debias = cbind(id, T.hat), 
+	T.hat <- data.frame(T.hat, check.names=FALSE)
+	T.hat <- cbind(ID = id, T.hat)
+	final <- list(code.debias = T.hat, 
 				  csmf = p.hat, 
 				  phy.bias = Pi.hat, 
 				  cond.prob  = theta.hat)

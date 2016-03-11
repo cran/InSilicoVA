@@ -6,7 +6,7 @@
 \title{Summarizing InSilicoVA Model Fits}
 \usage{
 \method{summary}{insilico}(object, CI.csmf = 0.95, CI.cond = 0.95,
-  file = NULL, top = 10, ...)
+  file = NULL, top = 10, id = NULL, ...)
 }
 \arguments{
 \item{object}{Fitted \code{"insilico"} object.}
@@ -20,18 +20,20 @@ cause of death distribution will be saved to the file.}
 
 \item{top}{Number of top causes to display on screen.}
 
+\item{id}{ID of specific death to display on screen.}
+
 \item{\dots}{Not used.}
 }
 \value{
-\item{id}{ the ID of the deaths.}
+\item{id.all}{ all IDs of the deaths.}
 \item{indiv}{ individual Cause of Death distribution matrix.}
 \item{csmf}{ CSMF distribution and confidence interval for each cause.}
 \item{csmf.ordered}{ CSMF distribution and confidence interval for each cause, ordered by mean.}
 \item{condprob}{ Conditional probability matrix and confidence intervals.}
-\item{useProbbase}{Component of \code{"insilico"} object.}
+\item{updateCondProb}{Component of \code{"insilico"} object.}
 \item{keepProbbase.level}{Component of \code{"insilico"} object.}
 \item{datacheck}{Component of \code{"insilico"} object.}
-\item{length.sim}{Component of \code{"insilico"} object.}
+\item{Nsim}{Component of \code{"insilico"} object.}
 \item{thin}{Component of \code{"insilico"} object.} \item{burnin}{Component
 of \code{"insilico"} object.}
 \item{jump.scale}{Component of \code{"insilico"} object.}
@@ -54,7 +56,7 @@ below for more detail.
 \dontrun{
 # load sample data together with sub-population list
 data(RandomVA1)
-# extract INterVA style input data
+# extract InterVA style input data
 data <- RandomVA1$data
 # extract sub-population information.
 # The groups are "HIV Positive", "HIV Negative" and "HIV status unknown".
@@ -62,7 +64,7 @@ subpop <- RandomVA1$subpop
 
 # run without subpopulation
 fit1<- insilico( data, subpop = NULL,
-              length.sim = 400, burnin = 200, thin = 10 , seed = 1,
+              Nsim = 400, burnin = 200, thin = 10 , seed = 1,
               external.sep = TRUE, keepProbbase.level = TRUE)
 summary(fit1)
 summary(fit1, top = 10)
