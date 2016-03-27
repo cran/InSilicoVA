@@ -4,7 +4,7 @@
 \alias{insilico.train}
 \title{Modified InSilicoVA methods with training data}
 \usage{
-insilico.train(data, train, cause, causes.table, thre = 0.95,
+insilico.train(data, train, cause, causes.table = NULL, thre = 0.95,
   type = c("quantile", "fixed", "empirical")[1], isNumeric = FALSE,
   updateCondProb = TRUE, keepProbbase.level = TRUE, CondProb = NULL,
   CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE,
@@ -14,7 +14,7 @@ insilico.train(data, train, cause, causes.table, thre = 0.95,
   trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1,
   phy.code = NULL, phy.cat = NULL, phy.unknown = NULL,
   phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE,
-  indiv.CI = 0.95, ...)
+  indiv.CI = NULL, ...)
 }
 \arguments{
 \item{data}{The original data to be used. It is suggested to use similar

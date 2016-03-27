@@ -12,7 +12,7 @@ get.indiv(object, data = NULL, CI = 0.95, is.aggregate = FALSE,
 
 \item{data}{data for the fitted \code{"insilico"} object. The first column of the data should be the ID that matches the \code{"insilico"} fitted model.}
 
-\item{CI}{Confidence interval for posterior estimates.}
+\item{CI}{Credible interval for posterior estimates.}
 
 \item{is.aggregate}{logical indicator for constructing aggregated distribution rather than individual distributions.}
 
@@ -39,13 +39,14 @@ fit1<- insilico(RandomVA1, subpop = NULL,
                 auto.length = FALSE)
 summary(fit1, id = "d199")
 
-# The following script updates credible interval for individual
-# probabilities to 90\%
-indiv.new <- get.indiv(fit1, CI = 0.9)
-fit1$indiv.prob.lower <- indiv.new$lower
-fit1$indiv.prob.upper <- indiv.new$upper
-fit1$indiv.CI <- 0.9
-summary(fit1, id = "d199")
+# Calculate aggregated COD distributions
+agg.csmf <- get.indiv(data = RandomVA2, fit1, CI = 0.95,
+                     is.aggregate = TRUE, by = NULL)
+head(agg.csmf)
+
+agg.by.sex.age <- get.indiv(data = RandomVA2, fit1, CI = 0.95,
+                            is.aggregate = TRUE, by = list("sex", "age"))
+							   head(agg.by.sex.age$mean)
 }
 }
 \author{
@@ -60,6 +61,6 @@ assignment using verbal autopsies, \emph{arXiv preprint arXiv:1411.3042}
 \url{http://arxiv.org/abs/1411.3042} (2014)
 }
 \seealso{
-\code{\link{insilico}}, \code{\link{plot.insilico}}
+\code{\link{insilico}}, \code{\link{updateIndiv}}, \code{\link{plot.insilico}}
 }
 

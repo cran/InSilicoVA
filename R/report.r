@@ -57,10 +57,12 @@
 #'               external.sep = TRUE, keepProbbase.level = TRUE)
 #' summary(fit1)
 #' summary(fit1, top = 10)
+#'
+#' # save individual COD distributions to files
+#' summary(fit1, file = "results.csv")
 #' }
 #' @export summary.insilico
-summary.insilico <- function(object, CI.csmf = 0.95, CI.cond = 0.95, 
-				  file = NULL, top = 10, id = NULL, ...){
+summary.insilico <- function(object, CI.csmf = 0.95, CI.cond = 0.95, file = NULL, top = 10, id = NULL, ...){
 	id.all <- object$id
 	prob <- object$indiv.prob
 	csmf <- object$csmf
@@ -81,6 +83,7 @@ summary.insilico <- function(object, CI.csmf = 0.95, CI.cond = 0.95,
 	indiv <- cbind(id.all, prob)
 	## write individual COD distribution to file
 	if(!is.null(file)){
+		colnames(indiv)[1] <- "ID"
 		write.csv(indiv, file = file, row.names = FALSE)
 	}
 
@@ -157,10 +160,18 @@ summary.insilico <- function(object, CI.csmf = 0.95, CI.cond = 0.95,
 			stop("Invalid ID, not exist in data.")
 		}
 		whichtoprint <- order(object$indiv.prob[id, ], decreasing = TRUE)[1:top]
+
+		if(is.null(object$indiv.prob.lower)){
+			warning("C.I. for individual probabilities have not been calculated. Please use get.indiv() function to update C.I. first.\n")
+			indiv.prob <- cbind(object$indiv.prob[id, whichtoprint], NA, NA, NA)
+
+		}else{		
 		indiv.prob <- cbind(object$indiv.prob[id, whichtoprint], 
 							object$indiv.prob.lower[id, whichtoprint], 
 							object$indiv.prob.median[id, whichtoprint], 
 							object$indiv.prob.upper[id, whichtoprint])
+
+		}
 		colnames(indiv.prob) = c("Mean", "Lower", "Median", "Upper")	
 	}else{
 		indiv.prob <- NULL

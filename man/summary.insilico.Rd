@@ -68,6 +68,9 @@ fit1<- insilico( data, subpop = NULL,
               external.sep = TRUE, keepProbbase.level = TRUE)
 summary(fit1)
 summary(fit1, top = 10)
+
+# save individual COD distributions to files
+summary(fit1, file = "results.csv")
 }
 }
 \author{

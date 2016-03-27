@@ -15,7 +15,7 @@ insilico.fit(data, isNumeric = FALSE, updateCondProb = TRUE,
   phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE,
   customization.dev = FALSE, Probbase_by_symp.dev = FALSE,
   probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL,
-  gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = 0.95, ...)
+  gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, ...)
 }
 \arguments{
 \item{data}{see \code{\link{insilico}}}

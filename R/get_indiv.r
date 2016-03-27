@@ -5,7 +5,7 @@
 #' 
 #' @param object Fitted \code{"insilico"} object.
 #' @param data data for the fitted \code{"insilico"} object. The first column of the data should be the ID that matches the \code{"insilico"} fitted model.
-#' @param CI Confidence interval for posterior estimates.
+#' @param CI Credible interval for posterior estimates.
 #' @param is.aggregate logical indicator for constructing aggregated distribution rather than individual distributions.
 #' @param by list of column names to group by.
 #' @param java_option Option to initialize java JVM. Default to ``-Xmx1g'', which sets the maximum heap size to be 1GB.
@@ -19,7 +19,7 @@
 #' @author Zehang Li, Tyler McCormick, Sam Clark
 #' 
 #' Maintainer: Zehang Li <lizehang@@uw.edu>
-#' @seealso \code{\link{insilico}}, \code{\link{plot.insilico}}
+#' @seealso \code{\link{insilico}}, \code{\link{updateIndiv}}, \code{\link{plot.insilico}}
 #' @references Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
 #' Crampin, Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death
 #' assignment using verbal autopsies, \emph{arXiv preprint arXiv:1411.3042}
@@ -32,13 +32,14 @@
 #'                 auto.length = FALSE)
 #' summary(fit1, id = "d199")
 #' 
-#' # The following script updates credible interval for individual 
-#' # probabilities to 90%
-#' indiv.new <- get.indiv(fit1, CI = 0.9)
-#' fit1$indiv.prob.lower <- indiv.new$lower
-#' fit1$indiv.prob.upper <- indiv.new$upper
-#' fit1$indiv.CI <- 0.9
-#' summary(fit1, id = "d199")
+#' # Calculate aggregated COD distributions
+#' agg.csmf <- get.indiv(data = RandomVA2, fit1, CI = 0.95, 
+#'                      is.aggregate = TRUE, by = NULL)
+#' head(agg.csmf) 
+#' 
+#' agg.by.sex.age <- get.indiv(data = RandomVA2, fit1, CI = 0.95, 
+#'                             is.aggregate = TRUE, by = list("sex", "age"))
+#'							   head(agg.by.sex.age$mean) 
 #' }
 #' @export get.indiv
 get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by = NULL, java_option = "-Xmx1g", ...){
@@ -309,4 +310,50 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 	}
 
 
+}
+
+
+
+
+#' Update individual COD probabilities from InSilicoVA Model Fits
+#' 
+#' This function updates individual probabilities for each death and provide posterior credible intervals for each estimates. 
+#' 
+#' 
+#' @param object Fitted \code{"insilico"} object.
+#' @param CI Credible interval for posterior estimates.
+#' @param java_option Option to initialize java JVM. Default to ``-Xmx1g'', which sets the maximum heap size to be 1GB.
+#' @param \dots Not used.
+#' @return object Updated \code{"insilico"} object.
+#' @author Zehang Li, Tyler McCormick, Sam Clark
+#' 
+#' Maintainer: Zehang Li <lizehang@@uw.edu>
+#' @seealso \code{\link{insilico}}, \code{\link{get.indiv}}
+#' @references Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
+#' Crampin, Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death
+#' assignment using verbal autopsies, \emph{arXiv preprint arXiv:1411.3042}
+#' \url{http://arxiv.org/abs/1411.3042} (2014)
+#' @examples
+#' \dontrun{
+#' data(RandomVA1)
+#' fit1a<- insilico(RandomVA1, subpop = NULL,  
+#'                 Nsim = 1000, burnin = 500, thin = 10 , seed = 1,
+#'                 auto.length = FALSE)
+#' summary(fit1a, id = "d199")
+#' 
+#' # The following script updates credible interval for individual 
+#' fit1b <- updateIndiv(fit1a, CI = 0.95)
+#' summary(fit1b, id = "d199")
+#' }
+#' @export updateIndiv 
+
+updateIndiv <- function(object, CI = 0.95, java_option = "-Xmx1g", ...){
+		
+	 indiv  <- get.indiv(object, CI = CI, ...)
+	 object$indiv.prob.lower <- indiv$lower
+	 object$indiv.prob.upper <- indiv$upper
+	 object$indiv.prob.median <- indiv$median
+	 object$indiv.CI <- CI
+
+	 return(object)
 }

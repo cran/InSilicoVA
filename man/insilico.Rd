@@ -14,7 +14,7 @@ insilico(data, isNumeric = FALSE, updateCondProb = TRUE,
   trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1,
   phy.code = NULL, phy.cat = NULL, phy.unknown = NULL,
   phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE,
-  indiv.CI = 0.95, ...)
+  indiv.CI = NULL, ...)
 }
 \arguments{
 \item{data}{The original data to be used. It is suggested to use similar
@@ -141,7 +141,7 @@ are assigned deterministically by the corresponding symptoms.}
 
 \item{exclude.impossible.cause}{logical indicator to exclude impossible causes based on the age and gender of the death.}
 
-\item{indiv.CI}{credible interval for individual probabilities}
+\item{indiv.CI}{credible interval for individual probabilities. If set to NULL, individual COD distributions will not be calculated to accelerate model fitting time. See \code{\link{get.indiv}} for details of updating the C.I. later after fitting the model.}
 
 \item{...}{not used}
 }
