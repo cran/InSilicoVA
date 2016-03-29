@@ -5,7 +5,7 @@
 \title{Convergence test for fitted InSilico model}
 \usage{
 csmf.diag(csmf, conv.csmf = 0.02, test = c("gelman", "heidel")[2],
-  verbose = TRUE, autoburnin = FALSE, external.sep = TRUE, ...)
+  verbose = TRUE, autoburnin = FALSE, which.sub = NULL, ...)
 }
 \arguments{
 \item{csmf}{It could be either fitted \code{"insilico"} object, a list of
@@ -13,7 +13,7 @@ fitted \code{"insilico"} object from different chains of the same length but
 different starting values, i.e., different seed. Or it could be the matrix
 of CSMF obtained by \code{insilico}, or the list of matrices of CSMF. All
 CSMF could contain more than one subpopulations, but should be in the same
-format and order.}
+format and order. And notice if the raw CSMF is used instead of the \code{"insilico"} object, external causes might need to be removed manually by user is \code{external.sep} is TRUE when fitting the model.}
 
 \item{conv.csmf}{The minimum mean CSMF to be checked. Default to be 0.02,
 which means any causes with mean CSMF lower than 0.02 will not be tested.}
@@ -29,10 +29,7 @@ logical outcome for Heidelberger and Welch's test. Default to be TRUE.}
 chain as burn in. Default to be FALSE since \code{insilico} return only the
 iterations after burnin by default.}
 
-\item{external.sep}{Logical indicator for whether to separate out external
-causes first. Default set to be TRUE. If set to TRUE, the function will not
-check convergence for external causes, e.g., traffic accident, accidental
-fall, suicide, etc.}
+\item{which.sub}{the name of the sub-population to test when there are multiple in the fitted object.}
 
 \item{\dots}{Arguments to be passed to \link{heidel.diag} or
 \link{gelman.diag}}
@@ -55,13 +52,12 @@ not be comparable by this test.
 }
 \examples{
 # load sample data together with sub-population list
-data(RandomVA1)
+data(RandomVA2)
 \donttest{
-# extract INterVA style input data
-data <- RandomVA1$data
+# extract InterVA style input data
+data <- RandomVA2
 # extract sub-population information.
-# The groups are "HIV Positive", "HIV Negative" and "HIV status unknown".
-subpop <- RandomVA1$subpop
+subpop <- RandomVA2$sex
 
 # run without sub-population
 fit1a<- insilico( data, subpop = NULL,
@@ -75,13 +71,9 @@ fit1c<- insilico( data, subpop = NULL,
               auto.length = FALSE)
 # single chain check
 csmf.diag(fit1a)
-# equivalent way of check one chain
-csmf.diag(fit1a$csmf)
 
 # multiple chains check
 csmf.diag(list(fit1a, fit1b, fit1c), test = "gelman")
-# equivalent way of check one chain
-csmf.diag(list(fit1a$csmf, fit1b$csmf, fit1c$csmf), test = "gelman")
 
 
 # with sub-populations
@@ -94,16 +86,11 @@ fit2b<- insilico( data, subpop = subpop,
 fit2c<- insilico( data, subpop = subpop,
               Nsim = 400, burnin = 200, thin = 10 , seed = 3,
               auto.length = FALSE)
-
 # single chain check
 csmf.diag(fit2a)
-# equivalent way of check one chain
-csmf.diag(fit2a$csmf)
 
 # multiple chains check
-csmf.diag(list(fit2a, fit2b, fit2c), test = "gelman")
-# equivalent way of check one chain
-csmf.diag(list(fit2a$csmf, fit2b$csmf, fit2c$csmf), test = "gelman")
+csmf.diag(list(fit2a, fit2b, fit2c), test = "gelman", which.sub = "Men")
 }
 }
 \author{

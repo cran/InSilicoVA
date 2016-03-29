@@ -29,7 +29,7 @@
 #' different starting values, i.e., different seed. Or it could be the matrix
 #' of CSMF obtained by \code{insilico}, or the list of matrices of CSMF. All
 #' CSMF could contain more than one subpopulations, but should be in the same
-#' format and order.
+#' format and order. And notice if the raw CSMF is used instead of the \code{"insilico"} object, external causes might need to be removed manually by user is \code{external.sep} is TRUE when fitting the model.
 #' @param conv.csmf The minimum mean CSMF to be checked. Default to be 0.02,
 #' which means any causes with mean CSMF lower than 0.02 will not be tested.
 #' @param test Type of test. Currently supporting Gelman and Rubin's test
@@ -40,10 +40,7 @@
 #' @param autoburnin Logical indicator of whether to omit the first half of the
 #' chain as burn in. Default to be FALSE since \code{insilico} return only the
 #' iterations after burnin by default.
-#' @param external.sep Logical indicator for whether to separate out external
-#' causes first. Default set to be TRUE. If set to TRUE, the function will not
-#' check convergence for external causes, e.g., traffic accident, accidental
-#' fall, suicide, etc.
+#' @param which.sub the name of the sub-population to test when there are multiple in the fitted object.
 #' @param \dots Arguments to be passed to \link{heidel.diag} or
 #' \link{gelman.diag}
 #' @author Zehang Li, Tyler McCormick, Sam Clark
@@ -76,13 +73,12 @@
 #' @examples
 #' 
 #' # load sample data together with sub-population list
-#' data(RandomVA1)
+#' data(RandomVA2)
 #' \donttest{
-#' # extract INterVA style input data
-#' data <- RandomVA1$data
+#' # extract InterVA style input data
+#' data <- RandomVA2
 #' # extract sub-population information. 
-#' # The groups are "HIV Positive", "HIV Negative" and "HIV status unknown".
-#' subpop <- RandomVA1$subpop
+#' subpop <- RandomVA2$sex
 #' 
 #' # run without sub-population
 #' fit1a<- insilico( data, subpop = NULL, 
@@ -96,13 +92,9 @@
 #'               auto.length = FALSE)
 #' # single chain check
 #' csmf.diag(fit1a)
-#' # equivalent way of check one chain
-#' csmf.diag(fit1a$csmf)
 #' 
 #' # multiple chains check
 #' csmf.diag(list(fit1a, fit1b, fit1c), test = "gelman")
-#' # equivalent way of check one chain
-#' csmf.diag(list(fit1a$csmf, fit1b$csmf, fit1c$csmf), test = "gelman")
 #' 
 #' 
 #' # with sub-populations
@@ -115,39 +107,61 @@
 #' fit2c<- insilico( data, subpop = subpop,   
 #'               Nsim = 400, burnin = 200, thin = 10 , seed = 3, 
 #'               auto.length = FALSE)
-#' 
+ 
 #' # single chain check
 #' csmf.diag(fit2a)
-#' # equivalent way of check one chain
-#' csmf.diag(fit2a$csmf)
 #' 
 #' # multiple chains check
-#' csmf.diag(list(fit2a, fit2b, fit2c), test = "gelman")
-#' # equivalent way of check one chain
-#' csmf.diag(list(fit2a$csmf, fit2b$csmf, fit2c$csmf), test = "gelman")
+#' csmf.diag(list(fit2a, fit2b, fit2c), test = "gelman", which.sub = "Men")
 #' }
 #' 
 #' 
 #' @export csmf.diag
-csmf.diag <- function(csmf, conv.csmf = 0.02, test= c("gelman", "heidel")[2], verbose = TRUE, autoburnin = FALSE, external.sep = TRUE, ...){
+csmf.diag <- function(csmf, conv.csmf = 0.02, test= c("gelman", "heidel")[2], verbose = TRUE, autoburnin = FALSE, which.sub = NULL, ...){
 	
-	external.causes = seq(41, 51)
 	
 	# check if the input is insilico object or only csmf
 	if(class(csmf) == "insilico"){
-		if(external.sep){
-			csmf <- csmf[, -external.causes]
+		if(csmf$external){
+			if(class(csmf$csmf) == "list"){			
+				for(i in 1:length(csmf$csmf)){
+					csmf$csmf[[i]] <- csmf$csmf[[i]][ , -csmf$external.causes]
+				}	
+				csmf <- csmf$csmf		
+			}else{
+				# no subgroup	
+				csmf <- csmf$csmf[, -csmf$external.causes]	
+			}
 		}else{
 			csmf <- csmf$csmf
 		}
 	}  
-	if(class(csmf) == "list" && class(csmf[[1]]) == "insilico"){
+
+	# check if input is multiple insilico object, without sub population
+	if(class(csmf) == "list" && class(csmf[[1]]) == "insilico" 
+							 && class(csmf[[1]]$csmf) != "list" ){
 		csmf_only <- vector("list", length(csmf))
 		for(i in 1:length(csmf)){
-			if(external.sep){
-				csmf_only[[i]] <- csmf[[i]]$csmf[, -external.causes]
+			if(csmf[[i]]$external){
+				csmf_only[[i]] <- csmf[[i]]$csmf[, -csmf[[i]]$external.causes]
 			}else{
 				csmf_only[[i]] <- csmf[[i]]$csmf
+			}
+		}
+		csmf <- csmf_only
+	}
+	# check if input is multiple insilico object, with sub population
+	if(class(csmf) == "list" && class(csmf[[1]]) == "insilico" 
+							 && class(csmf[[1]]$csmf) == "list" ){
+		csmf_only <- vector("list", length(csmf))
+		if(is.null(which.sub)){
+			stop("Need to specify which sub-population to test")
+		}
+		for(i in 1:length(csmf)){
+			if(csmf[[i]]$external){
+				csmf_only[[i]] <- csmf[[i]]$csmf[[which.sub]][, -csmf[[i]]$external.causes]
+			}else{
+				csmf_only[[i]] <- csmf[[i]]$csmf[[which.sub]]
 			}
 		}
 		csmf <- csmf_only

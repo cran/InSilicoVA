@@ -1,6 +1,6 @@
-08582861f3e739845b25e860db88f28b *DESCRIPTION
+c02f92525a589126512fd9e4dd7c1eb3 *DESCRIPTION
 6223908c0441d08a88f4e4856510f56f *NAMESPACE
-d89cf806abadaf66898c7b4cb302bb68 *R/diag.r
+941b34c09ae24ffa3e40e9e38625c043 *R/diag.r
 f18b5616e1b6d6da2120c2bde4932e42 *R/extct_prob.r
 23ae36a5126c72f318eb502987569dc8 *R/get_indiv.r
 ce326f3e8f2d57b826e6785073ee43ff *R/groupplot.r
@@ -38,7 +38,7 @@ fd9947629362e14f3f3dfd39f2eba831 *man/SamplePhysician.Rd
 d6329cc5277e744b5a8a07fd2053bed5 *man/causetext.Rd
 c88cb95d2aa481792d018431d04717d0 *man/condprob.Rd
 2ff49520961bc55838ca8c86135d0a84 *man/condprobnum.Rd
-87ebf2cad74270ef1aec6f6463ff0f9c *man/csmf.diag.Rd
+becd5d5663666e0850f9a774b1d33342 *man/csmf.diag.Rd
 fc9676560c972c24f6ea041a67828459 *man/extract.prob.Rd
 2479610e5f414513af69365408658c48 *man/get.indiv.Rd
 941d0884616447bf6181ee74d11477d9 *man/indivplot.Rd
