@@ -18,7 +18,7 @@
 
 #' @author Zehang Li, Tyler McCormick, Sam Clark
 #' 
-#' Maintainer: Zehang Li <lizehang@@uw.edu>
+#' Maintainer: Zehang Li <lizehang@uw.edu>
 #' @seealso \code{\link{insilico}}, \code{\link{updateIndiv}}, \code{\link{plot.insilico}}
 #' @references Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
 #' Crampin, Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death
@@ -27,19 +27,19 @@
 #' @examples
 #' \dontrun{
 #' data(RandomVA1)
-#' fit1<- insilico(RandomVA1, subpop = NULL,  
+#' fit1<- insilico(RandomVA1, subpop = NULL,
 #'                 Nsim = 1000, burnin = 500, thin = 10 , seed = 1,
 #'                 auto.length = FALSE)
 #' summary(fit1, id = "d199")
 #' 
 #' # Calculate aggregated COD distributions
-#' agg.csmf <- get.indiv(data = RandomVA2, fit1, CI = 0.95, 
+#' agg.csmf <- get.indiv(data = RandomVA1, fit1, CI = 0.95, 
 #'                      is.aggregate = TRUE, by = NULL)
 #' head(agg.csmf) 
 #' 
-#' agg.by.sex.age <- get.indiv(data = RandomVA2, fit1, CI = 0.95, 
+#' agg.by.sex.age <- get.indiv(data = RandomVA1, fit1, CI = 0.95, 
 #'                             is.aggregate = TRUE, by = list("sex", "age"))
-#'							   head(agg.by.sex.age$mean) 
+#' head(agg.by.sex.age$mean) 
 #' }
 #' @export get.indiv
 get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by = NULL, java_option = "-Xmx1g", ...){

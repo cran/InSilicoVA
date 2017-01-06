@@ -240,7 +240,7 @@ removeBad <- function(data, is.numeric, subpop){
 	if(!is.numeric){
 		data.num <- matrix(0, dim(data)[1], dim(data)[2])		
 		for(i in 2:dim(data)[2]){
-			temp <- data[,i]
+			temp <- toupper(data[,i])
 			temp.ind <- which(temp == "Y")
 			data.num[temp.ind, i] <- 1
 		}
@@ -263,8 +263,9 @@ removeBad <- function(data, is.numeric, subpop){
 
 datacheck.interVAJava <- function(data, obj, warning.write){
 		
-		data("probbase", envir = environment())
-		probbase <- get("probbase", envir  = environment())
+		# this has been updated to correspond to the 4.03 version probbase which contains minor changes from before.
+		data("probbase3", envir = environment())
+		probbase <- get("probbase3", envir  = environment())
 
 		# get text matrix
 		dontask0 <- probbase[-1, 4:11]
@@ -1229,7 +1230,8 @@ if(pool.j != 0){
 	##======= CHECK THIS CHUNK ===========##
 }else{
 	if(customization.dev){
-		colnames(levels.gibbs) <- rev(table.dev[level.exist])
+		# colnames(levels.gibbs) <- rev(table.dev[level.exist])
+		colnames(levels.gibbs) <- table.dev[level.exist]		
 	}else{
 		colnames(levels.gibbs) <- c("I", "A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "E", "N")
 	}

@@ -40,13 +40,13 @@ fit1<- insilico(RandomVA1, subpop = NULL,
 summary(fit1, id = "d199")
 
 # Calculate aggregated COD distributions
-agg.csmf <- get.indiv(data = RandomVA2, fit1, CI = 0.95,
+agg.csmf <- get.indiv(data = RandomVA1, fit1, CI = 0.95,
                      is.aggregate = TRUE, by = NULL)
 head(agg.csmf)
 
-agg.by.sex.age <- get.indiv(data = RandomVA2, fit1, CI = 0.95,
+agg.by.sex.age <- get.indiv(data = RandomVA1, fit1, CI = 0.95,
                             is.aggregate = TRUE, by = list("sex", "age"))
-							   head(agg.by.sex.age$mean)
+head(agg.by.sex.age$mean)
 }
 }
 \author{
