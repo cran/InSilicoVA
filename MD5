@@ -1,11 +1,11 @@
-23e691c8477023e0acabb6534ef09093 *DESCRIPTION
+013d6980730af0abee377f17848c50d6 *DESCRIPTION
 6223908c0441d08a88f4e4856510f56f *NAMESPACE
 941b34c09ae24ffa3e40e9e38625c043 *R/diag.r
 f18b5616e1b6d6da2120c2bde4932e42 *R/extct_prob.r
 2f55bf65acabb850947d3db33b90712b *R/get_indiv.r
 ce326f3e8f2d57b826e6785073ee43ff *R/groupplot.r
 e0dc8a2161ed8d527ffda934f324e724 *R/indivplot.r
-cca47cc7ff5546e0b51fbd2c8b30b27a *R/insilico_core.r
+19cd293b9fd36649ae261a10c606da9c *R/insilico_core.r
 bac30999aca6b08b87a2a6bc645fd39d *R/insilico_standard.r
 e77f62deff1c874ade6b90df29343dd0 *R/insilico_train.r
 b7b962792af46d3d3347a8aa56a6c14f *R/onLoad.r
@@ -25,7 +25,7 @@ accf17390ba5314f4a1104581e099f52 *data/causetext.rda
 1d9680d8041c993be884355adce5df91 *data/condprobnum.rda
 6a5ce03f4300c720c52266b0f70122a5 *data/probbase.rda
 6a4d9d219fba51facb82cdcbc239ba3d *data/probbase3.rda
-854b72d17a4fb4cd4b72395a4ef53dc9 *inst/NEWS.rd
+8d6c82a0c3d20406a1bb9b4412471af6 *inst/NEWS.Rd
 85aaef7c5e3e500fbb2c78536fbb8332 *inst/java/Insilico.jar
 493986c300999b11ef78401d9a78ad63 *java/Insilico/src/InsilicoSampler.java
 6fc0c62a108406a970a5e5b184162ba8 *java/Insilico/src/MathUtil.java

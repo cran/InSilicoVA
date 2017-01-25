@@ -7,6 +7,11 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 \newcommand{\sspace}{\ifelse{latex}{\out{~}}{ }}
 
+\section{Changes in version 1.1.4 (2017-01-24)}{
+ \itemize{
+   \item Fix issue with sub-population specification of non-standard InterVA-4 input.
+ }
+}
 \section{Changes in version 1.1.3 (2017-01-02)}{
   \itemize{ 
     \item Fix issue with label order in probbase output.

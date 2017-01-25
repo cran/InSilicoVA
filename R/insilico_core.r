@@ -886,6 +886,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 			stop("Sub-population size not match")
 		}
 		subpop.numeric <- rep(0, length(subpop))
+		subpop_order_list <- sort(unique(subpop))
 		sublist <- vector("list", length(subpop_order_list))
 		subbelong <- rep(0, N)
 		for(i in 1:length(subpop_order_list)){
@@ -1151,6 +1152,9 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
     p.indiv  <- results$p.indiv 
     probbase.gibbs  <- results$probbase.gibbs 
     levels.gibbs  <- results$levels.gibbs
+    if(!is.null(subpop)){
+    	names(csmf.sub) <- subpop_order_list
+    }
 ##---------------------------------------------------------------------------------##
 ## To make output consistent for further analysis,
 ## 		add back external results
