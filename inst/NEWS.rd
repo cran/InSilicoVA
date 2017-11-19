@@ -7,9 +7,18 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 \newcommand{\sspace}{\ifelse{latex}{\out{~}}{ }}
 
+\section{Changes in version 1.1.5 (2017-11-17)}{
+ \itemize{
+   \item Fix issue for data without external causes.
+   \item Fix issue with print methods after last update.
+   \item Fix issue with neonate and child death assigned to impossible external causes.
+  \item Change data check steps to update symptoms to be missing instead of absence to introduce symptom dependence structures. 
+    \item Automatic remove impossible causes from CSMF based on subpopulation gender and age. 
+ }
+}
 \section{Changes in version 1.1.4 (2017-01-24)}{
  \itemize{
-   \item Fix issue with sub-population specification of non-standard InterVA-4 input.
+   \item Fix issue with sub-population specification and output labels of non-standard InterVA-4 input.
  }
 }
 \section{Changes in version 1.1.3 (2017-01-02)}{

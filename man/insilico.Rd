@@ -13,8 +13,8 @@ insilico(data, isNumeric = FALSE, updateCondProb = TRUE,
   levels.prior = NULL, levels.strength = 1, trunc.min = 1e-04,
   trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1,
   phy.code = NULL, phy.cat = NULL, phy.unknown = NULL,
-  phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE,
-  indiv.CI = NULL, ...)
+  phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE, 
+  no.is.missing = FALSE, indiv.CI = NULL, ...)
 }
 \arguments{
 \item{data}{The original data to be used. It is suggested to use similar
@@ -140,6 +140,8 @@ are assigned deterministically by the corresponding symptoms.}
 \code{\link{physician_debias}}) that overwrites \code{phy.code}.}
 
 \item{exclude.impossible.cause}{logical indicator to exclude impossible causes based on the age and gender of the death.}
+
+\item{no.is.missing}{logical indicator to treat all absence of symptoms as missing. Default to FALSE. If set to TRUE, InSilicoVA will perform calculations similar to InterVA-4 w.r.t treating absent symptoms. It is highly recommended to set this argument to FALSE.}
 
 \item{indiv.CI}{credible interval for individual probabilities. If set to NULL, individual COD distributions will not be calculated to accelerate model fitting time. See \code{\link{get.indiv}} for details of updating the C.I. later after fitting the model.}
 

@@ -5,8 +5,8 @@ print.insilico <- function(x,...){
 	cat(paste(x$Nsim, "iterations performed, with first", 
 			  x$burnin, "iterations discarded\n",
 			  trunc((x$Nsim - x$burnin)/x$thin), "iterations saved after thinning\n"))
-		if(x$useProbbase){
-			cat("Fitted with InterVA4 conditional probability matrix\n")
+		if(!x$updateCondProb){
+			cat("Fitted with fixed conditional probability matrix\n")
 		}else if(x$keepProbbase.level){
 			cat("Fitted with re-estimated InterVA4 conditional probability level table\n")	
 		}else{

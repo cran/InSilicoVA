@@ -131,6 +131,7 @@
 #' @param phy.debias Fitted object from physician coding debias function (see
 #' \code{\link{physician_debias}}) that overwrites \code{phy.code}.
 #' @param exclude.impossible.cause logical indicator to exclude impossible causes based on the age and gender of the death.
+#' @param no.is.missing logical indicator to treat all absence of symptoms as missing. Default to FALSE. If set to TRUE, InSilicoVA will perform calculations similar to InterVA-4 w.r.t treating absent symptoms. It is highly recommended to set this argument to FALSE.
 #' @param indiv.CI credible interval for individual probabilities. If set to NULL, individual COD distributions will not be calculated to accelerate model fitting time. See \code{\link{get.indiv}} for details of updating the C.I. later after fitting the model.
 #' @param ... not used
 #' 
@@ -309,7 +310,16 @@
 #' 
 #' }
 #' @export insilico
-insilico <- function(data, isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE, indiv.CI = NULL, ...){ 
+insilico <- function(data, isNumeric = FALSE, 
+  updateCondProb = TRUE, keepProbbase.level = TRUE,
+  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, 
+  warning.write = FALSE, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, 
+  auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, 
+  levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, 
+  subpop = NULL, java_option = "-Xmx1g", seed = 1, 
+  phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, 
+  phy.debias = NULL, exclude.impossible.cause = TRUE, 
+  no.is.missing = FALSE, indiv.CI = NULL, ...){ 
 	
 	# handling changes throughout time
 	  args <- as.list(match.call())
@@ -347,6 +357,7 @@ insilico <- function(data, isNumeric = FALSE, updateCondProb = TRUE, keepProbbas
 						phy.external = phy.external, 
 						phy.debias = phy.debias, 
 						exclude.impossible.cause = exclude.impossible.cause, 
+						no.is.missing = no.is.missing,
 						indiv.CI = indiv.CI)
 	return(fit)  	
 } 
