@@ -88,7 +88,7 @@
 #'               angle = 20)
 #' }
 #' 
-#' @export plot.insilico
+#' @export 
 plot.insilico <- function(x, type = c("errorbar", "bar", "compare")[1], 
 	top = 10, causelist = NULL, which.sub = NULL, 
 	xlab = "Causes", ylab = "CSMF", title = "Top CSMF Distribution", 

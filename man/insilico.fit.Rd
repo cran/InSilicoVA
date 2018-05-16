@@ -4,22 +4,26 @@
 \alias{insilico.fit}
 \title{Implement InSilicoVA methods with more flexible customization}
 \usage{
-insilico.fit(data, isNumeric = FALSE, updateCondProb = TRUE,
-  keepProbbase.level = TRUE, CondProb = NULL, CondProbNum = NULL,
-  datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE,
-  external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000,
-  auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1,
-  levels.prior = NULL, levels.strength = 1, trunc.min = 1e-04,
-  trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1,
-  phy.code = NULL, phy.cat = NULL, phy.unknown = NULL,
-  phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE,
-  no.is.missing = FALSE, customization.dev = FALSE,
-  Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL,
-  table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL,
-  indiv.CI = NULL, ...)
+insilico.fit(data, data.type = c("WHO2012", "WHO2016")[1],
+  isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,
+  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE,
+  datacheck.missing = TRUE, warning.write = FALSE, external.sep = TRUE,
+  Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE,
+  conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL,
+  levels.strength = 1, trunc.min = 1e-04, trunc.max = 0.9999,
+  subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL,
+  phy.cat = NULL, phy.unknown = NULL, phy.external = NULL,
+  phy.debias = NULL, exclude.impossible.cause = TRUE,
+  impossible.combination = NULL, no.is.missing = FALSE,
+  customization.dev = FALSE, Probbase_by_symp.dev = FALSE,
+  probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL,
+  gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL,
+  groupcode = FALSE, ...)
 }
 \arguments{
 \item{data}{see \code{\link{insilico}}}
+
+\item{data.type}{see \code{\link{insilico}}}
 
 \item{isNumeric}{see \code{\link{insilico}}}
 
@@ -77,6 +81,8 @@ insilico.fit(data, isNumeric = FALSE, updateCondProb = TRUE,
 
 \item{exclude.impossible.cause}{see \code{\link{insilico}}}
 
+\item{impossible.combination}{see \code{\link{insilico.train}}}
+
 \item{no.is.missing}{see \code{\link{insilico}}}
 
 \item{customization.dev}{Logical indicator for customized variables}
@@ -94,6 +100,8 @@ insilico.fit(data, isNumeric = FALSE, updateCondProb = TRUE,
 \item{nlevel.dev}{number of levels in \code{probbase.dev}. Default to be NULL}
 
 \item{indiv.CI}{credible interval for individual probabilities}
+
+\item{groupcode}{logical indicator of including the group code in the output causes}
 
 \item{...}{unused arguments}
 }

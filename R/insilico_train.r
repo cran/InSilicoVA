@@ -67,14 +67,15 @@
 #' @param phy.unknown see \code{\link{insilico}} for more detail.
 #' @param phy.external see \code{\link{insilico}} for more detail.
 #' @param phy.debias see \code{\link{insilico}} for more detail.
-#' @param exclude.impossible.cause Not Implemented
+#' @param exclude.impossible.cause Whether to include impossible causes
+#' @param impossible.combination a matrix of two columns, first is the name of symptoms, and the second is the name of causes. Each row corresponds to a combination of impossible symptom (that exists) and cause.
 #' @param indiv.CI see \code{\link{insilico}} for more detail.
 #' @param ... not used
 #'
 #' @return \code{insilico} object
 #' @export insilico.train
 #' 
-insilico.train <- function(data, train, cause, causes.table = NULL, thre = 0.95, type = c("quantile", "fixed", "empirical")[1], isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = NULL, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE, indiv.CI = NULL, ...){ 
+insilico.train <- function(data, train, cause, causes.table = NULL, thre = 0.95, type = c("quantile", "fixed", "empirical")[1], isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = NULL, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE, impossible.combination = NULL, indiv.CI = NULL, ...){ 
 	  
 	  # handling changes throughout time
 	  args <- as.list(match.call())
@@ -151,6 +152,7 @@ insilico.train <- function(data, train, cause, causes.table = NULL, thre = 0.95,
 						phy.debias = phy.debias, 
 						exclude.impossible.cause = FALSE, 
 						indiv.CI = indiv.CI, 
+						impossible.combination = impossible.combination,
 						
 						customization.dev = TRUE, 
 						Probbase_by_symp.dev = FALSE, 
@@ -158,7 +160,7 @@ insilico.train <- function(data, train, cause, causes.table = NULL, thre = 0.95,
 						table.dev = prob.learn$table.alpha, 
 						table.num.dev = prob.learn$table.num, 
 						gstable.dev = colnames(prob.learn$cond.prob), 
-						nlevel.dev = 15, 
+						nlevel.dev = 15
 						)
 	return(fit)  	
 } 

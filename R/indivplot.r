@@ -91,7 +91,7 @@
 #'                             "Other and unspecified infect dis", 
 #'                             "Other and unspecified NCD"))
 #' } 
-#' @export plot.insilico
+#' @export 
 indivplot <- function(x, type = c("errorbar", "bar")[1], 
 	top = 10, causelist = NULL, which.plot = NULL, 
 	xlab = "Causes", ylab = "COD distribution", 

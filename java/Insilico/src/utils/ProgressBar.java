@@ -1,4 +1,5 @@
- 
+package utils;
+
 import java.awt.BorderLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;

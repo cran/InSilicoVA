@@ -2,7 +2,6 @@
 % Please edit documentation in R/report.r
 \name{summary.insilico}
 \alias{summary.insilico}
-\alias{print.insilico_summary}
 \title{Summarizing InSilicoVA Model Fits}
 \usage{
 \method{summary}{insilico}(object, CI.csmf = 0.95, CI.cond = 0.95,

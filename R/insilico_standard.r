@@ -35,7 +35,6 @@
 #' For more detail of model specification, see the paper on
 #' \url{http://arxiv.org/abs/1411.3042}.
 #' 
-#' @aliases insilico print.insilico
 #' @param data The original data to be used. It is suggested to use similar
 #' input as InterVA4, with the first column being death IDs and 245 symptoms. 
 #' The only difference in input is InsilicoVA takes three levels: ``present'',
@@ -48,6 +47,7 @@
 #' unused columns than the standard InterVA4 input. But the first column should be 
 #' the death ID. For example input data format, see \code{RandomVA1} and 
 #' \code{RandomVA2}.
+#' @param data.type Type of questionnaire. ``WHO2012'' corresponds to the standard input of InterVA4, and  ``WHO2016'' corresponds to the standard input of InterVA5.
 #' @param isNumeric Indicator if the input is already in numeric form. If the
 #' input is coded numerically such that 1 for ``present'', 0 for ``absent'',
 #' and -1 for ``missing'', this indicator could be set to True to avoid
@@ -133,6 +133,7 @@
 #' @param exclude.impossible.cause logical indicator to exclude impossible causes based on the age and gender of the death.
 #' @param no.is.missing logical indicator to treat all absence of symptoms as missing. Default to FALSE. If set to TRUE, InSilicoVA will perform calculations similar to InterVA-4 w.r.t treating absent symptoms. It is highly recommended to set this argument to FALSE.
 #' @param indiv.CI credible interval for individual probabilities. If set to NULL, individual COD distributions will not be calculated to accelerate model fitting time. See \code{\link{get.indiv}} for details of updating the C.I. later after fitting the model.
+#' @param groupcode logical indicator of including the group code in the output causes
 #' @param ... not used
 #' 
 #' @return \item{id}{A vector of death ID. Note the order of the ID is in
@@ -161,6 +162,7 @@
 #' \item{indiv.prob.median}{median probability of each cause of death for each individual death.}
 #' \item{indiv.prob.lower}{lower CI bound for the probability of each cause of death for each individual death.}
 #' \item{indiv.prob.upper}{upper CI bound for the probability of each cause of death for each individual death.}
+#' \item{errors}{Logs of deleted observations and reasons of deletion.}
 #'  
 #' @author Zehang Li, Tyler McCormick, Sam Clark
 #' 
@@ -172,6 +174,16 @@
 #' \url{http://arxiv.org/abs/1411.3042} \cr \emph{Working paper no. 147, Center
 #' for Statistics and the Social Sciences, University of Washington}
 #' @keywords InSilicoVA
+#' @import rJava
+#' @import coda
+#' @import ggplot2
+#' @import InterVA5
+#' @importFrom stats median quantile rbinom reorder runif
+#' @importFrom utils write.csv
+#' @importFrom stats ecdf
+#' @importFrom utils data
+
+
 #' @examples
 #' \dontrun{
 #' data(RandomVA1) 
@@ -308,9 +320,16 @@
 #' 		   auto.length = FALSE) 
 #' summary(fit8)
 #' 
+#' # example to fit WHO2016 data
+#' data(RandomVA5)
+#' fit1a <- insilico(RandomVA5, data.type="WHO2016", subpop = NULL,  
+#'               Nsim = 1000, burnin = 500, thin = 10 , seed = 1,
+#' 		   auto.length = FALSE)
+#' summary(fit1a)
+#' plot(fit1)
 #' }
 #' @export insilico
-insilico <- function(data, isNumeric = FALSE, 
+insilico <- function(data, data.type = c("WHO2012", "WHO2016")[1], isNumeric = FALSE, 
   updateCondProb = TRUE, keepProbbase.level = TRUE,
   CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, 
   warning.write = FALSE, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, 
@@ -319,7 +338,7 @@ insilico <- function(data, isNumeric = FALSE,
   subpop = NULL, java_option = "-Xmx1g", seed = 1, 
   phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, 
   phy.debias = NULL, exclude.impossible.cause = TRUE, 
-  no.is.missing = FALSE, indiv.CI = NULL, ...){ 
+  no.is.missing = FALSE, indiv.CI = NULL, groupcode=FALSE, ...){ 
 	
 	# handling changes throughout time
 	  args <- as.list(match.call())
@@ -329,6 +348,7 @@ insilico <- function(data, isNumeric = FALSE,
 	  }
 
 	fit <- insilico.fit(data = data, 
+						data.type = data.type,
 						isNumeric = isNumeric, 
 						updateCondProb = updateCondProb, 
 						keepProbbase.level = keepProbbase.level, 
@@ -358,6 +378,7 @@ insilico <- function(data, isNumeric = FALSE,
 						phy.debias = phy.debias, 
 						exclude.impossible.cause = exclude.impossible.cause, 
 						no.is.missing = no.is.missing,
-						indiv.CI = indiv.CI)
+						indiv.CI = indiv.CI, 
+						groupcode=groupcode)
 	return(fit)  	
 } 

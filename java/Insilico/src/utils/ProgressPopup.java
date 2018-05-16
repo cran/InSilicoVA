@@ -1,7 +1,9 @@
+package utils;
+
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-
+import utils.ProgressBar;
 
 public class ProgressPopup {
 	JFrame frame;

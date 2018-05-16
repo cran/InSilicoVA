@@ -30,6 +30,7 @@
 #' @return \item{phy.bias}{Bias matrix for each physician}
 #' @return \item{cond.prob}{Conditional probability of symptoms given causes}
 #' 
+#' @export
 #' @examples 
 #' 
 #' data(RandomPhysician)

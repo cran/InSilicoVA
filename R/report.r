@@ -6,7 +6,6 @@
 #' fitted object on screen and show the several top CSMFs of user's choice. See
 #' below for more detail.
 #' 
-#' @aliases summary.insilico print.insilico_summary
 #' @param object Fitted \code{"insilico"} object.
 #' @param CI.csmf Confidence interval for CSMF estimates.
 #' @param CI.cond Confidence interval for conditional probability estimates
@@ -61,7 +60,8 @@
 #' # save individual COD distributions to files
 #' summary(fit1, file = "results.csv")
 #' }
-#' @export summary.insilico
+#' @export 
+
 summary.insilico <- function(object, CI.csmf = 0.95, CI.cond = 0.95, file = NULL, top = 10, id = NULL, ...){
 	id.all <- object$id
 	prob <- object$indiv.prob

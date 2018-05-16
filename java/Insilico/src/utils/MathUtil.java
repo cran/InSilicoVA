@@ -1,7 +1,10 @@
+package utils;
+
 import java.util.ArrayList;
 import java.util.Random;
 
 import org.apache.commons.math3.distribution.BetaDistribution;
+import org.apache.commons.math3.stat.descriptive.rank.Percentile;
 
 
 public class MathUtil {
@@ -63,4 +66,28 @@ public class MathUtil {
 			return(out);
 	}
 
+    // function to get mean from double vector
+    public static double getMean(double[] vec){
+        double mean = 0;
+        for(int i = 0; i < vec.length; i++){
+            mean += vec[i];
+        }
+        mean /= (vec.length + 0.0);
+        return(mean);
+    }
+
+    // function to get percentile from double vector
+    public static double getPercentile(double[] vec, double p){
+        Percentile perc = new Percentile();
+        return(perc.evaluate(vec, p * 100.0));
+    }
+
+//    public static void main(String[] args) {
+//        double[] vec = new double[]{1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0};
+//        System.out.println(getPercentile(vec, 0.1));
+//        System.out.println(getPercentile(vec, 0.5));
+//        System.out.println(getPercentile(vec, 0.98));
+//        System.out.println(getPercentile(vec, 0.23));
+//
+//    }
 }

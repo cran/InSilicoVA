@@ -7,6 +7,7 @@
 #' 
 #' 
 #' @param data see \code{\link{insilico}}
+#' @param data.type see \code{\link{insilico}}
 #' @param isNumeric see \code{\link{insilico}}
 #' @param updateCondProb see \code{\link{insilico}}
 #' @param keepProbbase.level see \code{\link{insilico}}
@@ -35,6 +36,7 @@
 #' @param phy.external see \code{\link{insilico}}
 #' @param phy.debias see \code{\link{insilico}}
 #' @param exclude.impossible.cause see \code{\link{insilico}}
+#' @param impossible.combination see \code{\link{insilico.train}}
 #' @param no.is.missing see \code{\link{insilico}}
 #' @param customization.dev Logical indicator for customized variables
 #' @param Probbase_by_symp.dev Not tested yet.
@@ -44,6 +46,7 @@
 #' @param gstable.dev Table of gold standard causes for each death. Default to be NULL
 #' @param nlevel.dev number of levels in \code{probbase.dev}. Default to be NULL
 #' @param indiv.CI credible interval for individual probabilities
+#' @param groupcode logical indicator of including the group code in the output causes
 #' @param ... unused arguments
 
 #' @return 
@@ -60,7 +63,7 @@
 #' @keywords InSilicoVA
 #' 
 #' @export insilico.fit
-insilico.fit <- function(data, isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE, no.is.missing = FALSE, customization.dev = FALSE, Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, ...){ 
+insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1],isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE, impossible.combination = NULL, no.is.missing = FALSE, customization.dev = FALSE, Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, groupcode=FALSE, ...){ 
   # handling changes throughout time
   args <- as.list(match.call())
   if(!is.null(args$length.sim)){
@@ -249,17 +252,65 @@ removeBad <- function(data, is.numeric, subpop){
 		data.num <- data
 	}
 	err <- NULL
+	log <- NULL
 	for(i in 1:dim(data.num)[1]){
-		if(sum(data.num[i, 2:8]) < 1 ||
-			sum(data.num[i, 9:10]) < 1 ||
-			sum(data.num[i, 23:223]) < 1){
+		if(sum(data.num[i, 2:8]) < 1){
 			err <- c(err, i)
+			log <- rbind(log, paste(data[i, 1], " Error in age indicator: Not Specified "))
+
+		}else if(sum(data.num[i, 9:10]) < 1){
+			err <- c(err, i)
+			log <- rbind(log, paste(data[i, 1], " Error in sex indicator: Not Specified "))
+
+		}else if(sum(data.num[i, 23:223]) < 1){
+			err <- c(err, i)
+			log <- rbind(log, paste(data[i, 1], " Error in indicators: No symptoms specified "))
 		}
 	}
-	if(is.null(err)) return(list(data = data, subpop = subpop))
+	if(is.null(err)) return(list(data = data, subpop = subpop, log=log))
 	if(!is.null(subpop)) return(list(data = data[-err, ], 
-									 subpop = subpop[-err]))
-	if(is.null(subpop)) return(list(data = data[-err, ], subpop = NULL))
+									 subpop = subpop[-err], log=log))
+	if(is.null(subpop)) return(list(data = data[-err, ], subpop = NULL, log=log))
+}
+
+	
+removeBadV5 <- function(data, is.numeric, subpop){
+###########################################################
+# function to remove data with no sex/age indicators 
+# @param:
+#		data        : as in main function
+#		is.numeric  : as in main function
+#		subpop      : as in main function
+# @values:
+# 		a list of data and subpop after removing bad data
+	if(!is.numeric){
+		data.num <- matrix(0, dim(data)[1], dim(data)[2])		
+		for(i in 2:dim(data)[2]){
+			temp <- toupper(data[,i])
+			temp.ind <- which(temp == "Y")
+			data.num[temp.ind, i] <- 1
+		}
+	}else{
+		data.num <- data
+	}
+	err <- NULL
+	log <- NULL
+	for(i in 1:dim(data.num)[1]){
+		if(sum(data.num[i, 6:12]) < 1){
+			err <- c(err, i)
+			log <- rbind(log, paste(data[i, 1], " Error in age indicator: Not Specified "))
+		}else if(sum(data.num[i, 4:5]) < 1){
+			err <- c(err, i)
+			log <- rbind(log, paste(data[i, 1], " Error in sex indicator: Not Specified "))
+		}else if(sum(data.num[i, 21:328]) < 1){
+			err <- c(err, i)
+			log <- rbind(log, paste(data[i, 1], " Error in indicators: No symptoms specified "))
+		}
+	}
+	if(is.null(err)) return(list(data = data, subpop = subpop, log=log))
+	if(!is.null(subpop)) return(list(data = data[-err, ], 
+									 subpop = subpop[-err], log=log))
+	if(is.null(subpop)) return(list(data = data[-err, ], subpop = NULL, log=log))
 }
 
 ## Update: for the first 9 symptoms (age and gender) instead of imputing 0, we impute NA
@@ -295,7 +346,7 @@ datacheck.interVAJava <- function(data, obj, warning.write){
 
 		data.num <- matrix(0, dim(data)[1], dim(data)[2] - 1)
 		for(j in 2:dim(data)[2]){
-			data.num[which(data[, j] == "Y"), j - 1] <- 1			
+			data.num[which(toupper(data[, j]) == "Y"), j - 1] <- 1			
 			data.num[which(data[, j] == "."), j - 1] <- -1
 		}
 
@@ -313,6 +364,37 @@ datacheck.interVAJava <- function(data, obj, warning.write){
 		}
 
 		return(do.call(rbind, lapply(checked, .jevalArray)))
+}
+
+## Update: for the first 9 symptoms (age and gender) instead of imputing 0, we impute NA
+##         this can also be customized to set to more symptoms...
+datacheck.interVA5 <- function(data, obj, warning.write){
+		
+		# this has been updated to correspond to the 4.03 version probbase which contains minor changes from before.
+		data("probbaseV5", envir = environment())
+		probbaseV5 <- get("probbaseV5", envir  = environment())
+
+		data.num <- matrix(0, dim(data)[1], dim(data)[2] - 1)
+		for(j in 2:dim(data)[2]){
+			data.num[which(toupper(data[, j]) == "Y"), j - 1] <- 1			
+			data.num[which(data[, j] == "."), j - 1] <- NA
+		}
+
+		# S <- dim(probbaseV5)[1]
+		# subst.vector <- rep(NA, length=S)
+        # subst.vector[probbaseV5[,6]=="N"] <- 0
+        # subst.vector[probbaseV5[,6]=="Y"] <- 1
+
+		checked <- data.num
+		warning <- NULL
+		for(i in 1:dim(data)[1]){
+			tmp <- InterVA5::DataCheck5(data.num[i,], id=data[i,1], probbaseV5=probbaseV5, write=warning.write)
+	        input.current <- tmp$Output
+	        warning[[i]] <- rbind(tmp$firstPass, tmp$secondPass)
+	        checked[i, ] <- input.current
+	    }
+
+		return(list(checked=checked, warning = warning))
 }
 
 
@@ -379,6 +461,98 @@ removeExt <- function(data, prob.orig, is.Numeric, subpop, subpop_order_list, ex
 	ext.cod[which(extData[,11] == pos)] <- extCauses[10]
 	# suicide
 	ext.cod[which(extData[,12] == pos)] <- extCauses[9]
+
+	# delete death confirmed external
+	if(length(ext.where) > 0){
+		data <- data[-ext.where, ]
+	}	
+	if(length(extSymps) > 0) data <- data[, -(extSymps + 1)]
+	# delete the causes from probbase
+	prob.orig <- prob.orig[ -(extSymps), -(extCauses)]
+
+	if(!is.null(subpop)){
+		ext.csmf <- vector("list", length(subpop_order_list))
+		for(i in 1:length(ext.csmf)){
+			ext.csmf[[i]] <- rep(0, length(extCauses))
+			ext.cod.temp <- ext.cod[which(ext.sub == subpop_order_list[i])]
+			if(!is.null(ext.cod.temp)){
+				for(j in 1:length(extCauses)){
+					ext.csmf[[i]][j] <- length(which(ext.cod.temp == extCauses[j]))
+				}
+				ext.csmf[[i]] <- ext.csmf[[i]]/length(which(subpop == subpop_order_list[i]))		
+			}
+		}
+	}else{
+		ext.csmf <- rep(0, length(extCauses))
+		for(i in 1:length(extCauses)){
+			ext.csmf[i] <- length(which(ext.cod == extCauses[i]))
+		}
+		ext.csmf <- ext.csmf/N.all		
+	}
+	if(length(ext.where) > 0) subpop <- subpop[-ext.where]
+	return(list(data = data, 
+				subpop = subpop,
+				prob.orig = prob.orig, 
+				ext.sub  = ext.sub,
+				ext.id = ext.id, 
+				ext.cod = ext.cod,
+				ext.csmf = ext.csmf))
+}
+
+removeExtV5 <- function(data, prob.orig, is.Numeric, subpop, subpop_order_list, external.causes, external.symps){
+###########################################################
+# function to remove external causes/symps and assign deterministic deaths
+# @param:
+#	   data
+#      prob.orig: directly from InterVA4
+# @values:
+#	   data: after removing external death
+#	   prob.orig: after deleting external symptoms
+#	   exts: external death list		
+	extSymps <- external.symps
+	extCauses <- external.causes
+	# extract subset of data for external symptoms
+	N.all <- dim(data)[1]
+	extData <- data[, extSymps + 1]
+	if(is.Numeric){
+		neg <- 0
+		pos <- 1
+	}else{
+		neg <- ""
+		pos <- "Y"
+	}
+	ext.where <- which(apply(extData, 1, function(x){
+									length(which(x == pos)) }) > 0)	
+	extData <- as.matrix(extData[ext.where, ])
+	ext.id <- data[ext.where, 1]
+	ext.sub <- subpop[ext.where]
+	# a smaller scale datacheck for external causes
+	extData[which(extData[,2] == pos), c(3, 5, 7, 10, 11, 13)] <- neg
+	extData[which(extData[,3] == pos), c(2, 5, 7, 10, 11, 13)] <- neg
+	extData[which(extData[,4] == pos), c(5, 7, 11, 13)] <- neg
+	extData[which(extData[,5] == pos), c(2,3,4,8,9,15)] <- neg
+	extData[which(extData[,6] == pos), c(5,9,13,15)] <- neg
+	extData[which(extData[,7] == pos), c(2,3,5,6,8,9,11,15)] <- neg
+	extData[which(extData[,8] == pos), c(5,7,9,11,15)] <- neg
+	extData[which(extData[,9] == pos),c(5,7,8,11,12,13,14,15)] <- neg
+	extData[which(extData[,15] == pos),c(5,7,8)] <- neg
+	extData[which(extData[,18] == pos),c(15)] <- neg
+	extData[which(extData[,19] == pos),c(3,15)] <- neg
+	
+	# initialize with all "unspecified ext causes"
+	ext.cod <- rep(extCauses[11], length(ext.id))
+	# begin checking symptoms
+	ext.cod[which(extData[,2] == pos)] <- extCauses[1]
+	ext.cod[which(extData[,3] == pos)] <- extCauses[2]
+	ext.cod[which(extData[,4] == pos)] <- extCauses[3]
+	ext.cod[which(extData[,5] == pos)] <- extCauses[7]
+	ext.cod[which(extData[,6] == pos)] <- extCauses[4]
+	ext.cod[which(extData[,9] == pos)] <- extCauses[5]
+	ext.cod[which(extData[,7] == pos)] <- extCauses[6]
+	ext.cod[which(extData[,10] == pos)] <- extCauses[9]
+	ext.cod[which(extData[,19] == pos)] <- extCauses[9]
+	ext.cod[which(extData[,15] == pos)] <- extCauses[10]
+	ext.cod[which(extData[,18] == pos)] <- extCauses[8]
 
 	# delete death confirmed external
 	if(length(ext.where) > 0){
@@ -493,6 +667,15 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 ##----------------------------------------------------------##
 ##       Helper functions all loaded                        ##
 ##----------------------------------------------------------##
+	if(data.type == "WHO2016"){
+		# change data coding
+		for(i in 2:dim(data)[2]){
+			data[, i] <- as.character(data[, i])
+			data[data[,i]=="n", i] <- ""
+			data[data[,i]=="N", i] <- ""
+			data[data[,i]=="-", i] <- "."
+		}
+	} 
 	if(no.is.missing){
 		data[data == ""] <- "."
 	}
@@ -537,11 +720,23 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 	##----------------------------------------------------------##
 	## initialize key data dependencies
 	##----------------------------------------------------------##	
-	data("probbase", envir = environment())
-	probbase<- get("probbase", envir  = environment())
-	data("causetext", envir = environment())
-	causetext<- get("causetext", envir  = environment())
-	
+	if(data.type == "WHO2012"){
+		data("probbase3", envir = environment())
+		probbase<- get("probbase3", envir  = environment())
+		data("causetext", envir = environment())
+		causetext<- get("causetext", envir  = environment())		
+	}else{
+		data("probbaseV5", envir = environment())
+		probbase<- get("probbaseV5", envir  = environment())
+		data("causetextV5", envir = environment())
+		causetext<- get("causetextV5", envir  = environment())		
+	}
+	 if (groupcode) {
+        causetext <- causetext[, -2]
+    }
+    else {
+        causetext <- causetext[, -3]
+    }
 	
 	##----------------------------------------------------------##
 	## Extract sub-populations		
@@ -572,31 +767,57 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 	##----------------------------------------------------------##
 	## without developer customization		
 	##----------------------------------------------------------##
-	if(!customization.dev){
-		# get interVA probbase
-	  	prob.orig <- probbase[2:246,17:76]
-	  	
-	  	
-	  	if(dim(data)[2] != dim(probbase)[1] ){
-	  		correct_names <- probbase[2:246, 2]
-	  		exist <- correct_names %in% colnames(data)
-	  		if(length(which(exist == FALSE)) > 0){
-		        stop(paste("error: invalid data input format. Symptom(s) not found:", correct_names[!exist]))
-	  		}else{
-	  			data <- data[, c(1, match(correct_names, colnames(data)))]
-	  		}
-	    }
+	if(!customization.dev ){
 
-	    ## check the column names and give warning
-	    data("RandomVA1", envir = environment())
-	    RandomVA1 <- get("RandomVA1", envir  = environment())
-	    valabels <- colnames(RandomVA1)
-	    vacauses <- causetext[4:63,2]
-	    external.causes = seq(41, 51)
-	    external.symps = seq(211, 222)
+		if(data.type == "WHO2012"){
+			# get interVA probbase
+		    Sys_Prior <- as.numeric(change.inter(probbase[1,17:76], order = FALSE), standard = TRUE)
+		  	prob.orig <- probbase[2:246,17:76]
+		  	if(dim(data)[2] != dim(probbase)[1] ){
+		  		correct_names <- probbase[2:246, 2]
+		  		exist <- correct_names %in% colnames(data)
+		  		if(length(which(exist == FALSE)) > 0){
+			        stop(paste("error: invalid data input format. Symptom(s) not found:", correct_names[!exist]))
+		  		}else{
+		  			data <- data[, c(1, match(correct_names, colnames(data)))]
+		  		}
+	    	}
+	    	## check the column names and give warning
+		    data("RandomVA1", envir = environment())
+		    RandomVA1 <- get("RandomVA1", envir  = environment())
+		    valabels <- colnames(RandomVA1)
+		    vacauses <- causetext[4:63,2]
+		    external.causes = seq(41, 51)
+		    external.symps = seq(211, 222)
+
+		}else if(data.type == "WHO2016"){
+			Sys_Prior <- as.numeric(change.inter(probbase[1,21:81], order = FALSE), standard = TRUE)
+			prob.orig <- probbase[2:354,21:81]
+		  	if(dim(data)[2] != dim(probbase)[1] ){
+		  		correct_names <- probbase[2:354, 1]
+		  		exist <- correct_names %in% colnames(data)
+		  		if(length(which(exist == FALSE)) > 0){
+			        stop(paste("error: invalid data input format. Symptom(s) not found:", correct_names[!exist]))
+		  		}else{
+		  			data <- data[, c(1, match(correct_names, colnames(data)))]
+		  		}
+	    	}
+	    	## check the column names and give warning
+		    data("RandomVA5", envir = environment())
+		    RandomVA1 <- get("RandomVA5", envir  = environment())
+		    valabels <- colnames(RandomVA1)
+		    vacauses <- causetext[4:64,2]
+		    external.causes = seq(50, 60)
+		    external.symps = seq(20, 38)
+
+		}else{
+			stop("Wrong data.type, need to be WHO2012 or WHO2016")
+		}
+	  	
+	  
 	    
 	    count.changelabel = 0
-	    for(i in 1:246){
+	    for(i in 1:length(valabels)){
 	        if(tolower(colnames(data)[i]) != tolower(valabels)[i]){
 	            warning(paste("Input columne '", colnames(data)[i], "' does not match InterVA standard: '", 
 	                    valabels[i], "'", sep = ""),
@@ -621,9 +842,14 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		##-----------------------------------------------------##
 		## remove bad data happens before taking into missing
 		## (i.e. data without age/sex or has no real symptoms)
-		tmp <- removeBad(data, isNumeric, subpop)
+		if(data.type == "WHO2012"){
+			tmp <- removeBad(data, isNumeric, subpop)
+		}else if(data.type == "WHO2016"){
+			tmp <- removeBadV5(data, isNumeric, subpop)
+		}
 	  	data <- tmp[[1]]
 	  	subpop <- tmp[[2]]
+  	  	errorlog <- tmp[[3]]
   	  	if(is.null(subpop)){
 	  		subpop_order_list <- NULL
 	  	}else{
@@ -635,6 +861,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		## with developer customization		
 		##----------------------------------------------------------##	
 		# only match columns exactly as in probbase
+		Sys_Prior <- rep(1, dim(probbase.dev)[2])
 	  	correct_names <- rownames(probbase.dev)
 	  	exist <- correct_names %in% colnames(data)
 	  	if(sum(exist) == 0){
@@ -647,6 +874,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
   		valabels <- colnames(data)
 	    vacauses <- gstable.dev
 	    external.causes <- NULL
+	    errorlog <- NULL
   	}
 
   	# standardize to Upper case
@@ -661,18 +889,36 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 
   	if(datacheck){
 		cat("Performing data consistency check...\n")
-		checked <- datacheck.interVAJava(data, obj, warning.write)
+		if(data.type == "WHO2012"){
+			# code missing as -1
+			checked <- datacheck.interVAJava(data, obj, warning.write)
+			warning <- NULL
+		}else{
+			# code missing as NA
+			checked <- datacheck.interVA5(data, obj, warning.write)
+			warning <- checked$warning
+			checked <- checked$checked
+		}
 		cat("Data check finished.\n")
 		## update in data with missing, nothing is updated into missing, so only changing Y and N
 		for(i in 1:(dim(data)[2]-1)){
 			data[which(checked[, i] == 1), i+1] <- "Y"
 			data[which(checked[, i] == 0), i+1] <- ""
-			data[which(checked[, i] == -1), i+1] <- "."
+			data[which(checked[, i] == -1), i+1] <- "." # for 2012
+			data[which(is.na(checked[, i])), i+1] <- "." # for 2016
 		}	
+  	}else{
+  		warning <- NULL
   	}
   	## remove external causes
   	if(external.sep){
+  		if(data.type == "WHO2012"){
   		externals <- removeExt(data,prob.orig, isNumeric, subpop, subpop_order_list, external.causes, external.symps)
+
+  		
+  		}else{
+			externals <- removeExtV5(data,prob.orig, isNumeric, subpop, subpop_order_list, external.causes, external.symps)
+  		}
   		data <- externals$data
   		subpop <- externals$subpop
   		prob.orig <- externals$prob.orig
@@ -692,7 +938,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 	if(length(missing.all) > 0){
 		warning(paste(length(missing.all), "symptom missing completely and added to missing list", 
 			"\nList of missing symptoms: \n", 
-			paste( probbase[missing.all + 1, 2], collapse = ", ")), 
+			paste( probbase[missing.all + 1, 2-as.numeric(data.type == "WHO2016")], collapse = ", ")), 
 		call. = FALSE, immediate. = TRUE)		
 	}
 	## remove all missing symptoms from both data and probbase
@@ -768,7 +1014,11 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
   	## also the value saved is the index (starting from 1)
   	if(exclude.impossible.cause && (!customization.dev)){
 	  	impossible <- NULL
-	  	demog.set <- c("elder", "midage", "adult", "child", "under5", "infant", "neonate", "male", "female")
+	  	if(data.type == "WHO2012"){
+		  	demog.set <- c("elder", "midage", "adult", "child", "under5", "infant", "neonate", "male", "female")
+	  	}else{
+	  		demog.set <- c("i019a", "i019b", "i022a", "i022b", "i022c", "i022d", "i022e", "i022f", "i022g")
+	  	}
 	  	demog.index <- match(demog.set, colnames(data)[-1])
 	  	demog.index <- demog.index[!is.na(demog.index)]
   		for(ss in demog.index){
@@ -779,8 +1029,18 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 			}
 		}
 		impossible <- as.matrix(impossible)	
+	}else if(!is.null(impossible.combination) && exclude.impossible.cause){
+		impossible <- NULL
+		for(ii in 1:dim(impossible.combination)){
+			ss <- match(impossible.combination[ii, 1], rownames(prob.orig))
+			cc <- match(impossible.combination[ii, 2], colnames(prob.orig))
+			if((!is.na(ss)) && (!is.na(cc))){
+					impossible <- rbind(impossible, c(as.integer(cc), as.integer(ss)))
+			}
+		}
 	}else{
 		# java checks if impossible has 2 columns
+		# and set check impossible cause flag to false if it has 3 columns...
 		impossible <- matrix(as.integer(0), 1, 3)
 	}
 
@@ -959,7 +1219,6 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 	##---------------------------------------------------------------##
 	## parameter initialization
 	# csmf.prior <- rep(1/C, C)
-	Sys_Prior <- as.numeric(change.inter(probbase[1,17:76], order = FALSE), standard = TRUE)
 	# Number of indicators + 13 description variables. A_group:14-16;B_group:17:76;D_group:77:81
 	D <- length(Sys_Prior)
 	csmf.prior <- Sys_Prior/sum(Sys_Prior)
@@ -1302,7 +1561,9 @@ out <- list(
 		trunc.max = trunc.max, 
 		subpop = subpop, 
 		indiv.CI = indiv.CI, 
-		is.customized = customization.dev)
+		is.customized = customization.dev,
+		errors = errorlog,
+		warning = warning)
 
 # get also individual probabilities
 if(!is.null(indiv.CI)){

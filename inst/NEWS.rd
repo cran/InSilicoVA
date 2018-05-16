@@ -7,6 +7,16 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 \newcommand{\sspace}{\ifelse{latex}{\out{~}}{ }}
 
+\section{Changes in version 1.2.0 (2018-04-20)}{
+ \itemize{
+   \item Add WHO 2016 support using InterVA5 input
+   \item Add option to allow group code in output
+   \item Add warning and error logs in the InSilico object, so that removed observations can be traced back
+   \item Make probbase consistent with InterVA-4.03 instead of 4.02. Changes should be minimum, but good to be consistent.
+   \item Allow user defined impossible causes to be removed
+ }
+}
+
 \section{Changes in version 1.1.5 (2017-11-17)}{
  \itemize{
    \item Fix issue for data without external causes.
