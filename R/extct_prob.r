@@ -148,7 +148,7 @@ extract.prob <- function(train, gs, gstable, thre = 0.95, type = c("quantile", "
 	## for other causes and symptoms
 	bysymps <- apply(cond.prob, 1, countna)
 	if(length(which(bysymps > 0)) > 0){
-		cat(paste("\n", length(which(bysymps > 0)), "missing symptom-cause combinations in training data, imputed using average symptom prevalence\n"))
+		message(paste("\n", length(which(bysymps > 0)), "missing symptom-cause combinations in training data, imputed using average symptom prevalence\n"))
 		## impute by Pr(s | c) by Prob(s | any c) 
 		##   i.e. relatively no info provided from this s-c combination
 		overall <- apply(train, 2, countyes) / dim(train)[1]

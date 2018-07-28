@@ -81,7 +81,7 @@ insilico.train <- function(data, train, cause, causes.table = NULL, thre = 0.95,
 	  args <- as.list(match.call())
 	  if(!is.null(args$length.sim)){
 	  	Nsim <- args$length.sim
-	  	cat("length.sim argument is replaced with Nsim argument, will remove in later versions.\n")
+	  	message("length.sim argument is replaced with Nsim argument, will remove in later versions.\n")
 	  }
 
 	prob.learn <- extract.prob(train = train, 

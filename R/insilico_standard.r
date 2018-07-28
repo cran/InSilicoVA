@@ -344,7 +344,7 @@ insilico <- function(data, data.type = c("WHO2012", "WHO2016")[1], isNumeric = F
 	  args <- as.list(match.call())
 	  if(!is.null(args$length.sim)){
 	  	Nsim <- args$length.sim
-	  	cat("length.sim argument is replaced with Nsim argument, will remove in later versions.\n")
+	  	message("length.sim argument is replaced with Nsim argument, will remove in later versions.\n")
 	  }
 
 	fit <- insilico.fit(data = data, 

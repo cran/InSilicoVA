@@ -57,7 +57,7 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 		data <- data.frame(data)
 		# check by variable
 		if(is.null(by)){
-			cat("No groups specified, aggregate for all deaths\n")
+			message("No groups specified, aggregate for all deaths\n")
 			data$sub <- "All"
 			col.index <- which(colnames(data) == "sub")
 		}else{
@@ -79,7 +79,7 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 		if(length(n.match) == 0){
 			stop("No data has the matching ID as in the fitted insilico object")
 		}else{
-			cat(paste(n.match, "deaths matched from data to the fitted object\n"))
+			message(paste(n.match, "deaths matched from data to the fitted object\n"))
 		}
 
 		# get grouping vector and names for all data
@@ -116,7 +116,7 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 		for(i in 1:length(object$csmf)){
 			csmf[i, , ] <- object$csmf[[i]]
 		}
-		subpop <- as.integer(match(object$subpop, names(object$csmf)))
+		subpop <- as.integer(pmatch(object$subpop, names(object$csmf), duplicates.ok=T))
 	}	
 
 
@@ -176,7 +176,7 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 	csmf.j <- .jarray(csmf, dispatch = TRUE)
 	#-------------------------------------------------------------------#
 	if(!is.aggregate){
-		cat("Calculating individual COD distributions...\n")
+		message("Calculating individual COD distributions...\n")
 		# return rbind(mean, median, low, up), (4N) * C matrix
 		indiv  <- .jcall(obj, "[[D", "IndivProb", 
 					 data.j, impossible.j, csmf.j, subpop.j, condprob.j, 
@@ -186,9 +186,13 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 		
 		# if not customized probbase, use longer cause names for output
 		if(!object$is.customized){
-			data("causetext", envir = environment())
-			causetext<- get("causetext", envir  = environment())
-			
+			if(object$data.type == "WHO2012"){
+				data("causetext", envir = environment())
+				causetext<- get("causetext", envir  = environment())
+			}else{
+				data("causetextV5", envir = environment())
+				causetext<- get("causetextV5", envir  = environment())
+			}			
 			match.cause <- pmatch(causetext[, 1],  colnames(object$probbase))
 			index.cause <- order(match.cause)[1:sum(!is.na(match.cause))]
 			colnames(indiv) <- causetext[index.cause, 2]
@@ -204,13 +208,13 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 			external.causes <- object$external.causes
 			C0 <- dim(indiv)[2]
 			ext.flag <- apply(object$indiv.prob[, external.causes], 1, sum)
-			ext.probs <- object$indiv.prob[which(ext.flag == 1), ]
+			ext.probs <- object$indiv.prob[which(ext.flag > 0), , drop = FALSE]
 
 			indiv <- cbind(indiv[, 1:(external.causes[1] - 1)], 
 				          matrix(0, dim(indiv)[1], length(external.causes)), 
 				          indiv[, external.causes[1]:C0])
 			colnames(indiv) <- colnames(object$indiv.prob)
-			id.out <- c(id[match(rownames(object$data), id)], id[which(ext.flag == 1)])
+			id.out <- c(id[match(rownames(object$data), id)], id[which(ext.flag > 0)])
 		}else{
 			id.out <- id
 			ext.probs <- NULL
@@ -227,16 +231,20 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 
 	#-------------------------------------------------------------------#
 	}else{
-		cat("Aggregating individual COD distributions...\n")
+		message("Aggregating individual COD distributions...\n")
 		# return (4 x Ngroup) * (C + 1) matrix, last column is sample size
 		indiv  <- .jcall(obj, "[[D", "AggIndivProb", 
 					 data.j, impossible.j, csmf.j, subpop.j, condprob.j,
 					 datagroup.j, Ngroup, (1 - CI)/2, 1-(1-CI)/2, 
 					 Nsub, Nitr, C, S)
 		indiv <- do.call(rbind, lapply(indiv, .jevalArray))
-		data("causetext", envir = environment())
-		causetext<- get("causetext", envir  = environment())
-		
+		if(object$data.type == "WHO2012"){
+				data("causetext", envir = environment())
+				causetext<- get("causetext", envir  = environment())
+		}else{
+			data("causetextV5", envir = environment())
+			causetext<- get("causetextV5", envir  = environment())
+		}		
 		weight <- indiv[, dim(indiv)[2]]
 		indiv <- indiv[, -dim(indiv)[2]]
 
@@ -252,7 +260,7 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 			external.causes <- object$external.causes
 			C0 <- dim(indiv)[2]
 			ext.flag <- apply(object$indiv.prob[, external.causes], 1, sum)
-			ext.probs <- data.frame(object$indiv.prob[which(ext.flag == 1), external.causes])
+			ext.probs <- data.frame(object$indiv.prob[which(ext.flag > 0), external.causes, drop = FALSE])
 			ext.probs$ID <- rownames(ext.probs)
 			ext.probs <- merge(ext.probs, datagroup.all[, c("ID", "final.group.num")])
 			probcolumns <- which(colnames(ext.probs) %in% c("ID", "final.group.num") == FALSE)

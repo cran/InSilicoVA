@@ -110,6 +110,27 @@ plot.insilico <- function(x, type = c("errorbar", "bar", "compare")[1],
 	## for multiple populations plot 
 	##
 	if(type == "compare"){
+
+		if(!is.null(which.sub)){
+			if(length(which.sub) == 1){
+				type <- "errorbar"
+				message("Only one subpopulation selected.")
+			}
+		}
+	}
+	
+	if(type == "compare"){
+		if(!is.null(which.sub)){
+			which.sub <- pmatch(which.sub, names(sx$csmf.ordered))
+			which.sub <- which.sub[!is.na(which.sub)]
+			# if(sum(is.na(which.sub)) > 0) stop("Invalid 'which.sub', no match found.")
+			ctemp <- vector("list", length(which.sub))
+			for(i in 1:length(which.sub)){
+				ctemp[[i]] <- sx$csmf.ordered[[which.sub[i]]] 
+				names(ctemp)[i] <- names(sx$csmf.ordered)[which.sub[i]]
+			}
+			sx$csmf.ordered <- ctemp
+		}
 		# get which causes to plot
 		# if causelist is provided then fine, 
 		# otherwise construct from top argument
@@ -156,8 +177,9 @@ plot.insilico <- function(x, type = c("errorbar", "bar", "compare")[1],
 			# if there are multiple subpopulation
 			if(is.null(which.sub)) stop("More than one groups detected. Please specify which to plot")
 			if(class(which.sub) == "character"){
-				which.sub <- match(which.sub, names(sx$csmf.ordered))
-				if(is.na(which.sub)) stop("Invalid 'which.sub', no match found.")
+				which.sub <- pmatch(which.sub, names(sx$csmf.ordered))
+				which.sub <- which.sub[!is.na(which.sub)]
+				# if(is.na(which.sub)) stop("Invalid 'which.sub', no match found.")
 			}
 			csmf.ordered <- sx$csmf.ordered[[which.sub]][, c(1, 3, 5)]	
 		}
@@ -224,8 +246,7 @@ plot.insilico <- function(x, type = c("errorbar", "bar", "compare")[1],
 			g <- ggplot(csmf.toplot, aes(x=reorder(Causes, seq(1:length(Causes))),
 									 y=Mean))
 		}
-		g <- g + geom_point( stat="identity", 
-				 colour=border, fill=fill,  size = point_size)
+		g <- g + geom_point( stat="identity", size = point_size)
 		g <- g + geom_errorbar(aes(ymin = Lower, ymax = Upper), size = err_size, width = err_width, position = position_dodge(.9))
 		g <- g + xlab(xlab) + ylab(ylab) 
 		g <- g + ggtitle(title)
