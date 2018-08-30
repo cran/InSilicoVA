@@ -1,11 +1,17 @@
 % Check from R:
-%  news(db = tools:::.build_news_db_from_package_NEWS_Rd("~/R/Pkgs/Matrix/inst/NEWS.Rd"))
 \name{NEWS}
 \title{News for \R Package \pkg{InSilicoVA}}
 \encoding{UTF-8}
 
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 \newcommand{\sspace}{\ifelse{latex}{\out{~}}{ }}
+
+\section{Changes in version 1.2.3 (2018-08-27)}{
+ \itemize{
+   \item Add codes to safely handle data containing NA values.
+   \item Fix the writing of warning and error log files for both WHO 2012 and 2016 formats, and allowed customized directory. 
+ }
+}
 
 \section{Changes in version 1.2.2 (2018-07-13)}{
  \itemize{

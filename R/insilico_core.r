@@ -16,6 +16,7 @@
 #' @param datacheck see \code{\link{insilico}}
 #' @param datacheck.missing see \code{\link{insilico}}
 #' @param warning.write see \code{\link{insilico}}
+#' @param directory see \code{\link{insilico}}
 #' @param external.sep see \code{\link{insilico}}
 #' @param Nsim see \code{\link{insilico}}
 #' @param thin see \code{\link{insilico}}
@@ -63,7 +64,7 @@
 #' @keywords InSilicoVA
 #' 
 #' @export insilico.fit
-insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1],isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE, impossible.combination = NULL, no.is.missing = FALSE, customization.dev = FALSE, Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, groupcode=FALSE, ...){ 
+insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1],isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE, impossible.combination = NULL, no.is.missing = FALSE, customization.dev = FALSE, Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, groupcode=FALSE, ...){ 
   # handling changes throughout time
   args <- as.list(match.call())
   if(!is.null(args$length.sim)){
@@ -75,6 +76,20 @@ insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1],isNumeric 
   	colnames(data)[which(colnames(data) == "i183o")] <- "i183a"
   	message("Due to the inconsistent names in the early version of InterVA5, the indicator 'i183o' has been renamed as 'i183a'.")
   }
+  if(!is.null(directory)){
+  	  if(strsplit(directory, "")[[1]][1] == "~"){
+  	  	directory <- gsub("~", Sys.getenv("HOME"), directory)
+  	  }
+	  if(tail(strsplit(directory, "")[[1]], 1) != "/"){
+	  	dir_err <- paste0(directory, "/")
+	  }else{
+	  	dir_err <- directory
+	  }	
+	    dir.create(dir_err, showWarnings = FALSE)
+  }else{
+	 dir_err <- NULL
+  }
+
 
 ##----------------------------------------------------------##
 ##       Helper functions                                   ##
@@ -320,7 +335,7 @@ removeBadV5 <- function(data, is.numeric, subpop){
 
 ## Update: for the first 9 symptoms (age and gender) instead of imputing 0, we impute NA
 ##         this can also be customized to set to more symptoms...
-datacheck.interVAJava <- function(data, obj, warning.write){
+datacheck.interVAJava <- function(data, obj, warning.write, dir_err = NULL){
 		
 		# this has been updated to correspond to the 4.03 version probbase which contains minor changes from before.
 		data("probbase3", envir = environment())
@@ -365,7 +380,7 @@ datacheck.interVAJava <- function(data, obj, warning.write){
 		}else{
 			id.j <- .jarray(as.character(data[, 1]), dispatch = TRUE)
 			symps.j <- .jarray(colnames(data)[-1], dispatch = TRUE)
-			checked  <- .jcall(obj, "[[D", "Datacheck", dontask.j, askif.j, zero_to_missing_list.j, data.j, id.j, symps.j, "warning_insilico.txt")
+			checked  <- .jcall(obj, "[[D", "Datacheck", dontask.j, askif.j, zero_to_missing_list.j, data.j, id.j, symps.j, paste0(dir_err, "warning_insilico.txt"))
 		}
 
 		return(do.call(rbind, lapply(checked, .jevalArray)))
@@ -393,16 +408,19 @@ datacheck.interVA5 <- function(data, obj, warning.write){
         # subst.vector[probbaseV5[,6]=="N"] <- 0
         # subst.vector[probbaseV5[,6]=="Y"] <- 1
 
-		warning <- NULL
+		warning <- vector("list", dim(data)[1])
+		firstPass <- secondPass <- NULL
 		for(i in 1:dim(data)[1]){
 			tmp <- InterVA5::DataCheck5(data.num[i,], id=data[i,1], probbaseV5=probbaseV5, InSilico_check = TRUE, write=warning.write)
 	        input.current <- tmp$Output
 	        warning[[i]] <- rbind(tmp$firstPass, tmp$secondPass)
+	        firstPass <- rbind(firstPass, tmp$firstPass)
+            secondPass <- rbind(secondPass, tmp$secondPass)
 	        checked[i, ] <- input.current
 	        if(i %% 10 == 0) cat(".")
 	    }
 
-		return(list(checked=checked, warning = warning))
+		return(list(checked=checked, warning = warning, firstPass=firstPass, secondPass = secondPass))
 }
 
 
@@ -686,6 +704,9 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		# change data coding
 		for(i in 2:dim(data)[2]){
 			data[, i] <- as.character(data[, i])
+			if(sum(is.na(data[, i])) > 0){
+				data[which(is.na(data[, i])), i] <- "."
+			}
 			data[data[,i]=="n", i] <- ""
 			data[data[,i]=="N", i] <- ""
 			misstmp <- which(data[,i] %in% c("Y", "y", "N", "n") == FALSE)
@@ -862,6 +883,11 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		## (i.e. data without age/sex or has no real symptoms)
 		if(data.type == "WHO2012"){
 			tmp <- removeBad(data, isNumeric, subpop)
+			if(warning.write){
+				cat(paste("Error log built for InSilicoVA", Sys.time(), "\n"),file=paste0(dir_err, "errorlog_insilico.txt"),append = FALSE)
+				 cat(tmp$errorlog, sep="\n", file=paste0(dir_err, "errorlog_insilico.txt"), 
+				 	append=TRUE)
+			}
 		}else if(data.type == "WHO2016"){
 			tmp <- removeBadV5(data, isNumeric, subpop)
 		}
@@ -909,16 +935,26 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		message("Performing data consistency check...\n")
 		if(data.type == "WHO2012"){
 			# code missing as -1
-			checked <- datacheck.interVAJava(data, obj, warning.write)
+			checked <- datacheck.interVAJava(data, obj,warning.write, dir_err)
 			warning <- NULL
 			offset <- 0
 		}else{
 			# code missing as NA
 			checked <- datacheck.interVA5(data, obj, warning.write)
 			warning <- checked$warning
+			if(warning.write){
+				 cat(paste("Error & warning log built for InSilicoVA", Sys.time(), "\n"),file=paste0(dir_err, "errorlog_insilico.txt"),append = FALSE)
+				 cat(errorlog, 
+				 	paste("\n", "the following data discrepancies were identified and handled:", "\n"), 
+				 	checked$firstPass, 
+				 	paste("\n", "Second pass", "\n"), 
+				 	checked$secondPass, sep="\n", file=paste0(dir_err, "errorlog_insilico.txt"), 
+				 	append=TRUE)
+			}
 			checked <- checked$checked
 			offset <- 1
 		}
+
 		message("Data check finished.\n")
 		## update in data with missing, nothing is updated into missing, so only changing Y and N
 		for(i in 1:(dim(data)[2]-1)){

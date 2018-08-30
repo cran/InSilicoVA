@@ -7,12 +7,13 @@
 insilico(data, data.type = c("WHO2012", "WHO2016")[1], isNumeric = FALSE,
   updateCondProb = TRUE, keepProbbase.level = TRUE, CondProb = NULL,
   CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE,
-  warning.write = FALSE, external.sep = TRUE, Nsim = 4000, thin = 10,
-  burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1,
-  levels.prior = NULL, levels.strength = 1, trunc.min = 1e-04,
-  trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1,
-  phy.code = NULL, phy.cat = NULL, phy.unknown = NULL,
-  phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE,
+  warning.write = FALSE, directory = NULL, external.sep = TRUE,
+  Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE,
+  conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL,
+  levels.strength = 1, trunc.min = 1e-04, trunc.max = 0.9999,
+  subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL,
+  phy.cat = NULL, phy.unknown = NULL, phy.external = NULL,
+  phy.debias = NULL, exclude.impossible.cause = TRUE,
   no.is.missing = FALSE, indiv.CI = NULL, groupcode = FALSE, ...)
 }
 \arguments{
@@ -49,14 +50,16 @@ probability matrix. Default to TRUE.}
 
 \item{datacheck}{Logical indicator for whether to check the data satisfying
 InterVA rules. Default set to be TRUE. If \code{warning.write} is set to
-true, the inconsistent input will be logged in file warnings.txt. It's
+true, the inconsistent input will be logged in file warning_insilico.txt and errorlog_insilico.txt. It's
 strongly suggested to be set to TRUE.}
 
 \item{datacheck.missing}{Logical indicator for whether to perform data check before deleting complete missing symptoms. Default to TRUE.}
 
 \item{warning.write}{Logical indicator for whether to save the changes made
 to data input by \code{datacheck}. If set to TRUE, the changes will be
-logged in file warnings.txt in current working directory.}
+logged in file warning_insilico.txt and errorlog_insilico.txt in current working directory.}
+
+\item{directory}{The directory to store the output from. It should be an valid existing directory or a folder to be created.}
 
 \item{external.sep}{Logical indicator for whether to separate out external
 causes first. Default set to be TRUE. If set to TRUE, the algorithm will
@@ -349,6 +352,22 @@ fit1a <- insilico(RandomVA5, data.type="WHO2016", subpop = NULL,
 		   auto.length = FALSE)
 summary(fit1a)
 plot(fit1)
+
+# example to change directory for error files
+fit1b <- insilico(RandomVA5[1:50, ], data.type="WHO2016", 
+					Nsim = 1000, burnin = 500, thin = 10 , 
+					seed = 1, warning.write = T, auto.length=F)
+fit1c <- insilico(RandomVA5[1:50, ], data.type="WHO2016", 
+					Nsim = 1000, burnin = 500, thin = 10 , 
+					seed = 1, warning.write = T, 
+					directory = "fit1b_errorfolder", auto.length=F)
+
+ # similarly for WHO 2012 version
+fit1<- insilico(RandomVA1, subpop = NULL,  
+              Nsim = 1000, burnin = 500, thin = 10 , seed = 1,
+		         auto.length = FALSE, 
+				 warning.write = T, directory = "fit1_errorfolder")
+
 }
 }
 \references{
