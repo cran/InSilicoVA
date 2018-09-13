@@ -1,12 +1,12 @@
-9efbcbcca2ece164a830b3fa96daf831 *DESCRIPTION
+15e67c40afb87fa898ff13377e1274bf *DESCRIPTION
 4e3728548469c10bd40e86cdd6f96420 *NAMESPACE
 941b34c09ae24ffa3e40e9e38625c043 *R/diag.r
 6adadd1b1ed7ef172860d1171a958c31 *R/extct_prob.r
 4eff4c8448ce7850bb760e78ab2380d3 *R/get_indiv.r
 ce326f3e8f2d57b826e6785073ee43ff *R/groupplot.r
 182b0faa23e18d942f19775e51a0f840 *R/indivplot.r
-9dc138bf73d553c2a78a7b9a31a3152e *R/insilico_core.r
-4957dcb50189d2b0424d0be846ccd4ea *R/insilico_standard.r
+3adb74bae65c5ee549f0e3a9e6864e2d *R/insilico_core.r
+2ad505ed436f2a7beca8ee4076d41315 *R/insilico_standard.r
 22132943ecd9939012d85de42f044899 *R/insilico_train.r
 b7b962792af46d3d3347a8aa56a6c14f *R/onLoad.r
 667d29e70316becfa1bfbb3fce94385b *R/phy_debias.r
@@ -25,8 +25,8 @@ accf17390ba5314f4a1104581e099f52 *data/causetext.rda
 1d9680d8041c993be884355adce5df91 *data/condprobnum.rda
 6a5ce03f4300c720c52266b0f70122a5 *data/probbase.rda
 6a4d9d219fba51facb82cdcbc239ba3d *data/probbase3.rda
-42d0b377be76f58c04bdb88c818e10b1 *inst/NEWS.rd
-b82549a404c6c6fd6428f5e77f07fa0c *inst/java/Insilico.jar
+5e6a0d4b5249bb4b78ef61e04a7b30d3 *inst/NEWS.rd
+722f5d2de6f1402ca3e68abb880bb903 *inst/java/Insilico.jar
 39f16e3e816c6fc038937ba4af34d084 *java/Insilico/src/sampler/InsilicoSampler2.java
 743c0c99bec15841db9d0d8dba70dab2 *java/Insilico/src/utils/MathUtil.java
 9097cd588c701df4c7f6d4128e8be3c5 *java/Insilico/src/utils/ProgressBar.java
@@ -44,8 +44,8 @@ c88cb95d2aa481792d018431d04717d0 *man/condprob.Rd
 ca8002dd06986a6469ae93065e32c0f2 *man/extract.prob.Rd
 e6f0d0a648d336803f6960ecf2e5d55f *man/get.indiv.Rd
 870d81d40efe0b3b3ab24898fd7b9889 *man/indivplot.Rd
-83f65f444e4df571db8872fadaded138 *man/insilico.Rd
-1a6e404ce63ab5aa63ea32e2006a833b *man/insilico.fit.Rd
+b283f566b1aa3097d31c96d21cc8c640 *man/insilico.Rd
+c488ffd153bae20533399c82f5ad3e3c *man/insilico.fit.Rd
 c223f260096409ec670a8825a79c10f8 *man/insilico.train.Rd
 79c0dc3797620ac56a347eab5243db0f *man/physician_debias.Rd
 4d56be277ed248d38a8329ebfb2acef3 *man/plot.insilico.Rd

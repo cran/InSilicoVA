@@ -6,6 +6,22 @@
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 \newcommand{\sspace}{\ifelse{latex}{\out{~}}{ }}
 
+
+\section{Changes in version 1.2.4 (2018-09-12)}{
+ \itemize{
+   \item Add option to exclude impossible causes based on different rules.
+   \item The previous default rule to exclude impossible causes is now called 'subset'. It further include impossible causes screening based on the following symptoms: 
+        \itemize{
+            \item baby died within 24 hours; between 24 and 48 hours; between 48 hours and within one week; between one to four weeks. 
+            \item baby born dead.
+            \item woman 12-19 years old; 20-34 years old; 35-49 years old.
+        }
+  \item Bug fix symptoms not negated when absence is taken as the significant value.      
+  \item Bug fix that converts absence to missing for WHO 2016 input introduced in version 1.2.3.
+  \item Bug fix for individual probability calculation when no cause has positive probabilities.
+ }
+}
+
 \section{Changes in version 1.2.3 (2018-08-27)}{
  \itemize{
    \item Add codes to safely handle data containing NA values.

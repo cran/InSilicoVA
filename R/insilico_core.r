@@ -64,7 +64,7 @@
 #' @keywords InSilicoVA
 #' 
 #' @export insilico.fit
-insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1],isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE, impossible.combination = NULL, no.is.missing = FALSE, customization.dev = FALSE, Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, groupcode=FALSE, ...){ 
+insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1],isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = c("subset", "all", "InterVA", "none")[1], impossible.combination = NULL, no.is.missing = FALSE, customization.dev = FALSE, Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, groupcode=FALSE, ...){ 
   # handling changes throughout time
   args <- as.list(match.call())
   if(!is.null(args$length.sim)){
@@ -89,6 +89,7 @@ insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1],isNumeric 
   }else{
 	 dir_err <- NULL
   }
+  negate <- NULL
 
 
 ##----------------------------------------------------------##
@@ -525,7 +526,7 @@ removeExt <- function(data, prob.orig, is.Numeric, subpop, subpop_order_list, ex
 				ext.csmf = ext.csmf))
 }
 
-removeExtV5 <- function(data, prob.orig, csmf.orig, is.Numeric, subpop, subpop_order_list, external.causes, external.symps){
+removeExtV5 <- function(data, prob.orig, csmf.orig, is.Numeric, subpop, subpop_order_list, external.causes, external.symps, nagete){
 ###########################################################
 # function to remove external causes/symps and assign deterministic deaths
 # @param:
@@ -600,6 +601,7 @@ removeExtV5 <- function(data, prob.orig, csmf.orig, is.Numeric, subpop, subpop_o
 	if(length(extSymps) > 0) data <- data[, -(extSymps + 1)]
 	# delete the causes from probbase
 	prob.orig <- prob.orig[ -(extSymps), -(extCauses)]
+	negate <- negate[-extSymps]
 
 	if(!is.null(subpop)){
 		ext.csmf <- vector("list", length(subpop_order_list))
@@ -621,7 +623,8 @@ removeExtV5 <- function(data, prob.orig, csmf.orig, is.Numeric, subpop, subpop_o
 				ext.id = ext.id, 
 				ext.prob = ext.prob,
 				ext.cod = NULL,
-				ext.csmf = ext.csmf))
+				ext.csmf = ext.csmf, 
+				negate = negate))
 }
 
 ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
@@ -704,11 +707,13 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		# change data coding
 		for(i in 2:dim(data)[2]){
 			data[, i] <- as.character(data[, i])
+			# Notice for WHO 2012 input, NA will be converted to absence
 			if(sum(is.na(data[, i])) > 0){
 				data[which(is.na(data[, i])), i] <- "."
 			}
-			data[data[,i]=="n", i] <- ""
-			data[data[,i]=="N", i] <- ""
+			if(sum(data[, i] == "") > 0) stop("Wrong format: WHO 2016 input uses 'N' to denote absence of symptom instead of ''. Please change your coding first.")
+			# data[data[,i]=="n", i] <- ""
+			# data[data[,i]=="N", i] <- ""
 			misstmp <- which(data[,i] %in% c("Y", "y", "N", "n") == FALSE)
 			if(length(misstmp) > 0) data[misstmp, i] <- "."
 		}
@@ -812,7 +817,8 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 			# get interVA probbase
 		    Sys_Prior <- as.numeric(change.inter(probbase[1,17:76], order = FALSE), standard = TRUE)
 		  	prob.orig <- probbase[2:246,17:76]
-		  	if(dim(data)[2] != dim(probbase)[1] ){
+		  	negate <- rep(FALSE, dim(prob.orig)[1])
+			if(dim(data)[2] != dim(probbase)[1] ){
 		  		correct_names <- probbase[2:246, 2]
 		  		exist <- correct_names %in% colnames(data)
 		  		if(length(which(exist == FALSE)) > 0){
@@ -832,6 +838,10 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		}else if(data.type == "WHO2016"){
 			Sys_Prior <- as.numeric(change.inter(probbase[1,21:81], order = FALSE), standard = TRUE)
 			prob.orig <- probbase[2:354,21:81]
+		 	subst.vector <- probbase[2:354, 6]
+		  	negate <- rep(FALSE, dim(prob.orig)[1])
+		  	negate[subst.vector == "N"] <- TRUE
+
 		  	if(dim(data)[2] != dim(probbase)[1] ){
 		  		correct_names <- probbase[2:354, 1]
 		  		exist <- correct_names %in% colnames(data)
@@ -871,7 +881,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 
 	  	if(!is.null(CondProb)){
 	  		prob.orig <- CondProb
-	  		exclude.impossible.cause <- FALSE
+	  		exclude.impossible.cause <- "none"
 	  	}
 	  	if(!is.null(CondProbNum)){
 	  		prob.orig <- CondProbNum 
@@ -922,6 +932,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
   	}
 
   	# standardize to Upper case
+	# WHO 2016 format should have been corrected to have no NA at this point
 	data <- data.frame(lapply(data, as.character), 
 					   stringsAsFactors=FALSE)
 	for(j in 2:dim(data)[2]){
@@ -941,6 +952,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		}else{
 			# code missing as NA
 			checked <- datacheck.interVA5(data, obj, warning.write)
+			
 			warning <- checked$warning
 			if(warning.write){
 				 cat(paste("Error & warning log built for InSilicoVA", Sys.time(), "\n"),file=paste0(dir_err, "errorlog_insilico.txt"),append = FALSE)
@@ -952,6 +964,10 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 				 	append=TRUE)
 			}
 			checked <- checked$checked
+			# negate indicators for WHO 2016
+			if(sum(negate) > 0){
+				checked[, which(negate == TRUE) + 1] <- 1 - checked[, which(negate == TRUE) + 1]
+			}
 			offset <- 1
 		}
 
@@ -960,8 +976,8 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		for(i in 1:(dim(data)[2]-1)){
 			data[which(checked[, i+offset] == 1), i+1] <- "Y"
 			data[which(checked[, i+offset] == 0), i+1] <- ""
-			data[which(checked[, i+offset] == -1), i+1] <- "." # for 2012
-			data[which(is.na(checked[, i+offset])), i+1] <- "." # for 2016
+			data[which(checked[, i+offset] == -1), i+1] <- "." # for 2012 (2012 does not have negate, so -1 is fine)
+			data[which(is.na(checked[, i+offset])), i+1] <- "." # for 2016 (NA after negate is still fine)
 		}	
   	}else{
   		warning <- NULL
@@ -974,11 +990,12 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
   		
   		}else{
   			csmf.orig <- probbase[1, -(1:20)]
-			externals <- removeExtV5(data,prob.orig, csmf.orig, isNumeric, subpop, subpop_order_list, external.causes, external.symps)
+			externals <- removeExtV5(data,prob.orig, csmf.orig, isNumeric, subpop, subpop_order_list, external.causes, external.symps, negate)
   		}
   		data <- externals$data
   		subpop <- externals$subpop
   		prob.orig <- externals$prob.orig
+  		negate <- externals$negate
   	}
 
 	##----------------------------------------------------------##
@@ -1002,7 +1019,9 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 	if(!is.null(missing.all)){	
 		data <- data[, -(missing.all + 1)]
 		prob.orig <- prob.orig[-missing.all, ]	
+		if(!is.null(negate)) negate <- negate[-missing.all]
 	}	
+
 
 	##----------------------------------------------------------##
    	## check interVA rules, ignoring missing at this step,
@@ -1069,19 +1088,29 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 	## check impossible pairs of symptoms and causes
   	## check only first demographic symptoms (7 age + 2 gender)
   	## also the value saved is the index (starting from 1)
-  	if(exclude.impossible.cause && (!customization.dev)){
+  	if(exclude.impossible.cause != "none" && (!customization.dev)){
 	  	impossible <- NULL
-	  	if(data.type == "WHO2012"){
-		  	demog.set <- c("elder", "midage", "adult", "child", "under5", "infant", "neonate", "male", "female")
+	  	if(exclude.impossible.cause == "subset"){
+	  		if(data.type == "WHO2012"){
+		  	demog.set <- c("elder", "midage", "adult", "child", "under5", "infant", "neonate", "male", "female", 
+		  		"magegp1", "magegp2", "magegp3", "died_d1", "died_d23", "died_d36", "died_w1", "no_life")
+	  		}else{
+	  			demog.set <- c("i019a", "i019b", "i022a", "i022b", "i022c", "i022d", "i022e", "i022f", "i022g", 
+	  						"i022h", "i022i", "i022j", "i022k", "i022l", "i022m", "i022n", "i114o")
+	  		}
 	  	}else{
-	  		demog.set <- c("i019a", "i019b", "i022a", "i022b", "i022c", "i022d", "i022e", "i022f", "i022g")
+	  		demog.set <- colnames(data)[-1]
+
 	  	}
 	  	demog.index <- match(demog.set, colnames(data)[-1])
 	  	demog.index <- demog.index[!is.na(demog.index)]
   		for(ss in demog.index){
 			for(cc in 1:C){
 				if(cond.prob.true[ss, cc] == 0){
-					impossible <- rbind(impossible, c(as.integer(cc), as.integer(ss)))
+					impossible <- rbind(impossible, c(as.integer(cc), as.integer(ss), as.integer(0)))
+				}
+				if(cond.prob.true[ss, cc] == 1 && tolower(exclude.impossible.cause) != "interva"){
+					impossible <- rbind(impossible, c(as.integer(cc), as.integer(ss), as.integer(1)))
 				}
 			}
 		}
@@ -1096,9 +1125,9 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 			}
 		}
 	}else{
-		# java checks if impossible has 2 columns
-		# and set check impossible cause flag to false if it has 3 columns...
-		impossible <- matrix(as.integer(0), 1, 3)
+		# java checks if impossible has 3 columns
+		# and set check impossible cause flag to false if it has 4 columns
+		impossible <- matrix(as.integer(0), 1, 4)
 	}
 
 

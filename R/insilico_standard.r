@@ -131,7 +131,7 @@
 #' are assigned deterministically by the corresponding symptoms.
 #' @param phy.debias Fitted object from physician coding debias function (see
 #' \code{\link{physician_debias}}) that overwrites \code{phy.code}.
-#' @param exclude.impossible.cause logical indicator to exclude impossible causes based on the age and gender of the death.
+#' @param exclude.impossible.cause option to exclude impossible causes at the individual level. The following rules are implemented: \code{subset}: Causes with 0 probability given the age group and gender of the observation, according to the InterVA conditional probabilities, are removed; \code{all}: Causes with 0 probability given any symptom of the observation, according to the InterVA conditional probabilities, are removed; \code{interVA}:  Causes with 0 probability given any positive indicators according to the InterVA conditional probabilities, are removed; and \code{none}: no causes are removed.
 #' @param no.is.missing logical indicator to treat all absence of symptoms as missing. Default to FALSE. If set to TRUE, InSilicoVA will perform calculations similar to InterVA-4 w.r.t treating absent symptoms. It is highly recommended to set this argument to FALSE.
 #' @param indiv.CI credible interval for individual probabilities. If set to NULL, individual COD distributions will not be calculated to accelerate model fitting time. See \code{\link{get.indiv}} for details of updating the C.I. later after fitting the model.
 #' @param groupcode logical indicator of including the group code in the output causes
@@ -354,7 +354,7 @@ insilico <- function(data, data.type = c("WHO2012", "WHO2016")[1], isNumeric = F
   levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, 
   subpop = NULL, java_option = "-Xmx1g", seed = 1, 
   phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, 
-  phy.debias = NULL, exclude.impossible.cause = TRUE, 
+  phy.debias = NULL, exclude.impossible.cause = c("subset", "all", "InterVA", "none")[1], 
   no.is.missing = FALSE, indiv.CI = NULL, groupcode=FALSE, ...){ 
 	
 	# handling changes throughout time
@@ -362,6 +362,16 @@ insilico <- function(data, data.type = c("WHO2012", "WHO2016")[1], isNumeric = F
 	  if(!is.null(args$length.sim)){
 	  	Nsim <- args$length.sim
 	  	message("length.sim argument is replaced with Nsim argument, will remove in later versions.\n")
+	  }
+
+	  if(class(exclude.impossible.cause) == "logical"){
+	  	if(exclude.impossible.cause){
+	  		exclude.impossible.cause <- "subset"
+	  	}else{
+	  		exclude.impossible.cause <- "none"
+	  	}
+
+	  	message(paste0("exclude.impossible.cause now has more options. Please check out the package documentation. Rest to '", exclude.impossible.cause, "'."))
 	  }
 
 	fit <- insilico.fit(data = data, 
