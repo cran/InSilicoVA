@@ -4,14 +4,15 @@
 \alias{insilico}
 \title{Implement InSilicoVA methods}
 \usage{
-insilico(data, data.type = c("WHO2012", "WHO2016")[1], isNumeric = FALSE,
-  updateCondProb = TRUE, keepProbbase.level = TRUE, CondProb = NULL,
-  CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE,
-  warning.write = FALSE, directory = NULL, external.sep = TRUE,
-  Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE,
-  conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL,
-  levels.strength = 1, trunc.min = 1e-04, trunc.max = 0.9999,
-  subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL,
+insilico(data, data.type = c("WHO2012", "WHO2016")[1],
+  isNumeric = FALSE, updateCondProb = TRUE,
+  keepProbbase.level = TRUE, CondProb = NULL, CondProbNum = NULL,
+  datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE,
+  directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10,
+  burnin = 2000, auto.length = TRUE, conv.csmf = 0.02,
+  jump.scale = 0.1, levels.prior = NULL, levels.strength = 1,
+  trunc.min = 1e-04, trunc.max = 0.9999, subpop = NULL,
+  java_option = "-Xmx1g", seed = 1, phy.code = NULL,
   phy.cat = NULL, phy.unknown = NULL, phy.external = NULL,
   phy.debias = NULL, exclude.impossible.cause = c("subset", "all",
   "InterVA", "none")[1], no.is.missing = FALSE, indiv.CI = NULL,

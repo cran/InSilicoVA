@@ -39,7 +39,7 @@
 #' causelist <- c("Communicable", "TB/AIDS", "Maternal", 
 #'                "NCD", "External", "Unknown")
 #' phydebias <- physician_debias(RandomPhysician, phy.id = c("rev1", "rev2"), 
-#' phy.code = c("code1", "code2"), phylist = c("doc1", "doc2"), 
+#' phy.code = c("code1", "code2"), phylist = paste0("doc", c(1:15)), 
 #' causelist = causelist, tol = 0.0001, max.itr = 5000)
 #' 
 #' # see the first physician's bias matrix
@@ -104,7 +104,11 @@ physician_debias <- function(data, phy.id, phy.code, phylist, causelist, tol = 0
 
 	# Symptom Matrix of A * N (#Death * #Symptom)
 	W <-matrix(0, A, N)
-	W.raw <- data[, -c(1, docCol, causeCol)]
+	W.raw <- as.matrix(data[, -c(1, docCol, causeCol)])
+	W.raw[is.na(W.raw)] <- ""
+	if(sum(tolower(as.vector(W.raw)) %in% c("y", "", ".") == FALSE) > 0){
+		stop("Input may contain additional columns other than symptoms, physician IDs and physician codes. Please remove the additional columns, or check the coding of symptoms are correct.")
+	}
 	W[which(W.raw == "Y")] <- 1
 	W[which(W.raw == ".")] <- -1
 	noSymp <- which(apply(W, 2, sum) + A == 0)

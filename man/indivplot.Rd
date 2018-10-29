@@ -4,8 +4,9 @@
 \alias{indivplot}
 \title{plot aggregated COD distribution}
 \usage{
-indivplot(x, type = c("errorbar", "bar")[1], top = 10, causelist = NULL,
-  which.plot = NULL, xlab = "Causes", ylab = "COD distribution",
+indivplot(x, type = c("errorbar", "bar")[1], top = 10,
+  causelist = NULL, which.plot = NULL, xlab = "Causes",
+  ylab = "COD distribution",
   title = "COD distributions for the top causes", horiz = TRUE,
   angle = 60, fill = "lightblue", err_width = 0.4, err_size = 0.6,
   point_size = 2, border = "black", bw = FALSE, ...)

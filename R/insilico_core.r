@@ -584,24 +584,44 @@ removeExtV5 <- function(data, prob.orig, csmf.orig, is.Numeric, subpop, subpop_o
 	# ext.cod[which(extData[,15] == pos)] <- extCauses[10]
 	# ext.cod[which(extData[,18] == pos)] <- extCauses[8]
 
-	probs <- matrix(1, dim(extData)[1], length(external.causes))
-	for(i in 1:dim(extData)[1]){
-		for(j in 1:length(external.causes)){
-			probs[i, j] <- csmfsub[j] * prod(probsub[which(extData[i,] == pos), j])
-		}
-		probs[i, ] <- probs[i, ] / sum(probs[i, ])
-	}
-	ext.prob <- probs
-
-
-	# delete death confirmed external
-	if(length(ext.where) > 0){
-		data <- data[-ext.where, ]
-	}	
-	if(length(extSymps) > 0) data <- data[, -(extSymps + 1)]
 	# delete the causes from probbase
 	prob.orig <- prob.orig[ -(extSymps), -(extCauses)]
 	negate <- negate[-extSymps]
+	if(length(extSymps) > 0) data <- data[, -(extSymps + 1)]
+	if(length(ext.where) > 0){
+		probs <- matrix(1, dim(extData)[1], length(external.causes))
+		for(i in 1:dim(extData)[1]){
+			for(j in 1:length(external.causes)){
+				probs[i, j] <- csmfsub[j] * prod(probsub[which(extData[i,] == pos), j])
+			}
+			probs[i, ] <- probs[i, ] / sum(probs[i, ])
+		}
+		ext.prob <- probs	
+		# delete death confirmed external
+		data <- data[-ext.where, ]
+	}else{
+		if(!is.null(subpop)){
+			ext.csmf <- vector("list", length(subpop_order_list))
+			for(i in 1:length(ext.csmf)){
+				ext.csmf[[i]] <- rep(0, length(extCauses))
+			}
+		}else{
+			ext.csmf <- rep(0, length(extCauses))
+		}
+		ext.prob <- matrix(0, dim(extData)[1], length(external.causes))
+
+		return(list(data = data, 
+				subpop = subpop,
+				prob.orig = prob.orig, 
+				ext.sub  = ext.sub,
+				ext.id = ext.id, 
+				ext.prob = ext.prob,
+				ext.cod = NULL,
+				ext.csmf = ext.csmf, 
+				negate = negate))
+	}
+
+
 
 	if(!is.null(subpop)){
 		ext.csmf <- vector("list", length(subpop_order_list))
@@ -613,7 +633,7 @@ removeExtV5 <- function(data, prob.orig, csmf.orig, is.Numeric, subpop, subpop_o
 			}
 		}
 	}else{
-		ext.csmf <- apply(ext.prob, 2, mean) * length(ext.id) / N.all		
+		ext.csmf <- apply(ext.prob, 2, mean) * length(ext.id) / N.all	
 	}
 	if(length(ext.where) > 0) subpop <- subpop[-ext.where]
 	return(list(data = data, 
@@ -982,6 +1002,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
   	}else{
   		warning <- NULL
   	}
+  	if(length(data) == 0) stop("All deaths failed data checks. Please double check your input data.")
   	## remove external causes
   	if(external.sep){
   		if(data.type == "WHO2012"){
@@ -996,6 +1017,13 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
   		subpop <- externals$subpop
   		prob.orig <- externals$prob.orig
   		negate <- externals$negate
+  		if(dim(data)[1] == 0){
+  			message("All deaths are assigned external causes. A list of external causes is returned instead of insilico object.")
+  			out <- data.frame(ID = externals$ext.id, 
+  							  causes = vacauses[externals$ext.cod])
+
+  			return(out)
+  		}
   	}
 
 	##----------------------------------------------------------##

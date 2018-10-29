@@ -56,7 +56,7 @@ head(RandomPhysician[, 1:10])
 causelist <- c("Communicable", "TB/AIDS", "Maternal", 
                "NCD", "External", "Unknown")
 phydebias <- physician_debias(RandomPhysician, phy.id = c("rev1", "rev2"), 
-phy.code = c("code1", "code2"), phylist = c("doc1", "doc2"), 
+phy.code = c("code1", "code2"), phylist = paste0("doc", c(1:15)), 
 causelist = causelist, tol = 0.0001, max.itr = 5000)
 
 # see the first physician's bias matrix
