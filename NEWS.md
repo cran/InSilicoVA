@@ -1,5 +1,9 @@
 # InSilicoVA - changes
 
+Version 1.2.7 (2020-02-18)
+==========================
++ Include system checks for Java version at least 7.0.
+
 Version 1.2.6 (2020-02-17, on CRAN)
 ==========================
 + Include function to load the latest P(S|C) from InterVA-5 software

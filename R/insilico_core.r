@@ -73,6 +73,13 @@ insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NUL
   	message("length.sim argument is replaced with Nsim argument, will remove in later versions.\n")
   }
 
+  ## Add java system check
+  jv <- .jcall("java/lang/System", "S", "getProperty", "java.runtime.version")
+  if(substr(jv, 1L, 2L) == "1.") {
+	  jvn <- as.numeric(paste0(strsplit(jv, "[.]")[[1L]][1:2], collapse = "."))
+	  if(jvn < 1.7) stop("Java >= 7 is needed for this package but not available")
+   }
+
   if(data.type == "WHO2016" & "i183o" %in% colnames(data)){
   	colnames(data)[which(colnames(data) == "i183o")] <- "i183a"
   	message("Due to the inconsistent names in the early version of InterVA5, the indicator 'i183o' has been renamed as 'i183a'.")
