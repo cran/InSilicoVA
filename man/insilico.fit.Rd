@@ -4,7 +4,7 @@
 \alias{insilico.fit}
 \title{Implement InSilicoVA methods with more flexible customization}
 \usage{
-insilico.fit(data, data.type = c("WHO2012", "WHO2016")[1],
+insilico.fit(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL,
   isNumeric = FALSE, updateCondProb = TRUE,
   keepProbbase.level = TRUE, CondProb = NULL, CondProbNum = NULL,
   datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE,
@@ -25,6 +25,8 @@ insilico.fit(data, data.type = c("WHO2012", "WHO2016")[1],
 \item{data}{see \code{\link{insilico}}}
 
 \item{data.type}{see \code{\link{insilico}}}
+
+\item{sci}{see \code{\link{insilico}}}
 
 \item{isNumeric}{see \code{\link{insilico}}}
 

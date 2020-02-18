@@ -102,16 +102,16 @@ indivplot <- function(x, type = c("errorbar", "bar")[1],
 	
 
 	
-	if(class(x) == "list" && is.null(which.plot)){
+	if(methods::is(x, "list") && is.null(which.plot)){
 		compare <- TRUE
 		which.plot <- colnames(x$mean)
-	}else if(class(which.plot) == "list" && length(which.plot) > 1){
+	}else if(methods::is(which.plot,  "list") && length(which.plot) > 1){
 		compare <- TRUE
 	}else{
 		compare <- FALSE
 	}
 
-	if(class(x) != "list"){
+	if(!methods::is(x, "list")){
 		compare <- FALSE
 		which.plot <- "All"
 	}
@@ -120,7 +120,7 @@ indivplot <- function(x, type = c("errorbar", "bar")[1],
 	
 	## reshape data into: 
 	## [mean, median, lower, upper, group, cause]
-	if(class(x) == "list"){
+	if(methods::is(x, "list")){
 		dist <- cbind(as.vector(x$mean), 
 					  as.vector(x$median),
 					  as.vector(x$lower),

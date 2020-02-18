@@ -8,6 +8,7 @@
 #' 
 #' @param data see \code{\link{insilico}}
 #' @param data.type see \code{\link{insilico}}
+#' @param sci see \code{\link{insilico}}
 #' @param isNumeric see \code{\link{insilico}}
 #' @param updateCondProb see \code{\link{insilico}}
 #' @param keepProbbase.level see \code{\link{insilico}}
@@ -64,7 +65,7 @@
 #' @keywords InSilicoVA
 #' 
 #' @export insilico.fit
-insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1],isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = c("subset", "all", "InterVA", "none")[1], impossible.combination = NULL, no.is.missing = FALSE, customization.dev = FALSE, Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, groupcode=FALSE, ...){ 
+insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL, isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = c("subset", "all", "InterVA", "none")[1], impossible.combination = NULL, no.is.missing = FALSE, customization.dev = FALSE, Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, groupcode=FALSE, ...){ 
   # handling changes throughout time
   args <- as.list(match.call())
   if(!is.null(args$length.sim)){
@@ -389,11 +390,11 @@ datacheck.interVAJava <- function(data, obj, warning.write, dir_err = NULL){
 
 ## Update: for the first 9 symptoms (age and gender) instead of imputing 0, we impute NA
 ##         this can also be customized to set to more symptoms...
-datacheck.interVA5 <- function(data, obj, warning.write){
+datacheck.interVA5 <- function(data, obj, warning.write, probbaseV5){
 		
 		# this has been updated to correspond to the 4.03 version probbase which contains minor changes from before.
-		data("probbaseV5", envir = environment())
-		probbaseV5 <- get("probbaseV5", envir  = environment())
+		# data("probbaseV5", envir = environment())
+		# probbaseV5 <- get("probbaseV5", envir  = environment())
 
 		data.num <- matrix(0, dim(data)[1], dim(data)[2] - 1)
 		for(j in 2:dim(data)[2]){
@@ -790,8 +791,25 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		data("causetext", envir = environment())
 		causetext<- get("causetext", envir  = environment())		
 	}else{
-		data("probbaseV5", envir = environment())
-		probbase<- get("probbaseV5", envir  = environment())
+	    if (is.null(sci)) {
+	        data("probbaseV5", envir = environment())
+	        probbaseV5 <- get("probbaseV5", envir = environment())
+	        probbaseV5 <- as.matrix(probbaseV5)
+	        probbaseV5Version <- probbaseV5[1,3]
+	    }
+	    if (!is.null(sci)) {
+	        validSCI <- TRUE
+	        if (!is.data.frame(sci)) validSCI <- FALSE
+	        if (nrow(sci) != 354) validSCI <- FALSE
+	        if (ncol(sci) != 87) validSCI <- FALSE
+	        if (!validSCI) {
+	            stop("error: invalid sci (must be data frame with 354 rows and 87 columns).")
+	        }
+	        probbaseV5 <- as.matrix(sci)
+	        probbaseV5Version <- probbaseV5[1,3]
+	    }
+	    probbase <- probbaseV5
+	    message("Using Probbase version:  ", probbaseV5Version)
 		data("causetextV5", envir = environment())
 		causetext<- get("causetextV5", envir  = environment())		
 	}
@@ -806,7 +824,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 	## Extract sub-populations		
 	##----------------------------------------------------------##
 	# get subpopulation if it's a columnname
-  	if(class(subpop) == "list" || length(subpop) == 1){
+  	if(methods::is(subpop, "list") || length(subpop) == 1){
   		col.index <- match(subpop, colnames(data))
   		if(length(which(is.na(col.index))) > 0){
   			stop("error: invalid sub-population name specification")
@@ -902,32 +920,40 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 	  	if(!is.null(CondProb)){
 	  		prob.orig <- CondProb
 	  		exclude.impossible.cause <- "none"
+	  		vacauses <- colnames(CondProbNum)
+	  		if(is.null(vacauses)) vacauses <- paste0("Cause", 1:dim(CondProbNum)[2])	  	
 	  	}
 	  	if(!is.null(CondProbNum)){
 	  		prob.orig <- CondProbNum 
-	  		updateCondProb <- FALSE			
+	  		updateCondProb <- FALSE		
+	  		vacauses <- colnames(CondProbNum)
+	  		if(is.null(vacauses)) vacauses <- paste0("Cause", 1:dim(CondProbNum)[2])	
 	  	}
 	 
 		##-----------------------------------------------------##
 		## remove bad data happens before taking into missing
 		## (i.e. data without age/sex or has no real symptoms)
-		if(data.type == "WHO2012"){
-			tmp <- removeBad(data, isNumeric, subpop)
-			if(warning.write){
-				cat(paste("Error log built for InSilicoVA", Sys.time(), "\n"),file=paste0(dir_err, "errorlog_insilico.txt"),append = FALSE)
-				 cat(tmp$errorlog, sep="\n", file=paste0(dir_err, "errorlog_insilico.txt"), 
-				 	append=TRUE)
+		if(datacheck){
+			if(data.type == "WHO2012"){
+				tmp <- removeBad(data, isNumeric, subpop)
+				if(warning.write){
+					cat(paste("Error log built for InSilicoVA", Sys.time(), "\n"),file=paste0(dir_err, "errorlog_insilico.txt"),append = FALSE)
+					 cat(tmp$errorlog, sep="\n", file=paste0(dir_err, "errorlog_insilico.txt"), 
+					 	append=TRUE)
+				}
+			}else if(data.type == "WHO2016"){
+				tmp <- removeBadV5(data, isNumeric, subpop)
 			}
-		}else if(data.type == "WHO2016"){
-			tmp <- removeBadV5(data, isNumeric, subpop)
-		}
-	  	data <- tmp[[1]]
-	  	subpop <- tmp[[2]]
-  	  	errorlog <- tmp[[3]]
-  	  	if(is.null(subpop)){
-	  		subpop_order_list <- NULL
-	  	}else{
-		  	subpop_order_list <- sort(unique(subpop))
+		  	data <- tmp[[1]]
+		  	subpop <- tmp[[2]]
+	  	  	errorlog <- tmp[[3]]
+	  	  	if(is.null(subpop)){
+		  		subpop_order_list <- NULL
+		  	}else{
+			  	subpop_order_list <- sort(unique(subpop))
+		  	}
+	  	}else{	  			    
+	  		errorlog <- NULL
 	  	}
 
   	}else{
@@ -971,7 +997,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 			offset <- 0
 		}else{
 			# code missing as NA
-			checked <- datacheck.interVA5(data, obj, warning.write)
+			checked <- datacheck.interVA5(data, obj, warning.write, probbase)
 			
 			warning <- checked$warning
 			if(warning.write){
@@ -1019,9 +1045,15 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
   		negate <- externals$negate
   		if(dim(data)[1] == 0){
   			message("All deaths are assigned external causes. A list of external causes is returned instead of insilico object.")
-  			out <- data.frame(ID = externals$ext.id, 
+  			if(data.type == "WHO2012"){
+  				out <- data.frame(ID = externals$ext.id, 
   							  causes = vacauses[externals$ext.cod])
 
+  			}else if(data.type == "WHO2016"){
+  				extprobs <- externals$ext.prob
+	  			out <- data.frame(ID = externals$ext.id, extprobs)
+  				colnames(out)[-1] <- vacauses[external.causes]
+  			}
   			return(out)
   		}
   	}

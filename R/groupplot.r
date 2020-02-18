@@ -113,7 +113,7 @@ stackplot <- function(x, grouping = NULL,
 		err <- FALSE
 	}
 
-	if(class(x) == "list"){
+	if(methods::is(x, "list")){
 		counts <- rep(0, length(x))
 		for(i in 1:length(x)){
 			csmf[[i]] <- x[[i]]$csmf
@@ -124,7 +124,7 @@ stackplot <- function(x, grouping = NULL,
 			}
 			counts[i] <- length(x[[i]]$id)
 		}
-	}else if(class(x) == "insilico"){
+	}else if(methods::is(x, "insilico")){
 		if(is.null(x$subpop)){
 				if(sample.size.print){
 					title <- paste(title, "\n", "n = ", length(x$id), sep = "")

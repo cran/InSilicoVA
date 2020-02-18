@@ -146,7 +146,7 @@ plot.insilico <- function(x, type = c("errorbar", "bar", "compare")[1],
 		csmf.sub <- NULL
 		for(i in 1:length(sx$csmf.ordered)){
 			vcauses <- rownames(sx$csmf.ordered[[i]])
-			if(class(causelist) == "character"){
+			if(methods::is(causelist, "character")){
 				toplot <- rep(1, length(causelist))
 				for(j in 1:length(causelist)){
 					full <- match.arg(tolower(causelist[j]), tolower(vcauses))
@@ -176,7 +176,7 @@ plot.insilico <- function(x, type = c("errorbar", "bar", "compare")[1],
 		}else{
 			# if there are multiple subpopulation
 			if(is.null(which.sub)) stop("More than one groups detected. Please specify which to plot")
-			if(class(which.sub) == "character"){
+			if(methods::is(which.sub, "character")){
 				which.sub <- pmatch(which.sub, names(sx$csmf.ordered))
 				which.sub <- which.sub[!is.na(which.sub)]
 				# if(is.na(which.sub)) stop("Invalid 'which.sub', no match found.")
@@ -193,7 +193,7 @@ plot.insilico <- function(x, type = c("errorbar", "bar", "compare")[1],
 				stop("Invalid causes to plot. Please specify causelist or a positive top")
 			}
 		}else{
-			if(class(causelist) == "character"){
+			if(methods::is(causelist, "character")){
 				toplot <- rep(1, length(causelist))
 				for(i in 1:length(causelist)){
 					full <- match.arg(tolower(causelist[i]), tolower(vcauses))

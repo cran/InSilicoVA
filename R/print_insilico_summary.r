@@ -65,7 +65,7 @@ print.insilico_summary <- function(x, ...) {
 			print(x$subpop_counts)
 		}	
 		
-		if(class(x$csmf.ordered) != "list"){
+		if(!methods::is(x$csmf.ordered, "list")){
 			top <- min(x$showTop, dim(x$csmf.ordered)[1])
 			cat("\n")
 			cat(paste("Top", top,  "CSMFs:\n"))

@@ -121,7 +121,10 @@ insilico.train <- function(data, train, cause, causes.table = NULL, thre = 0.95,
 	    levels.strength <- 0.01
 	  }
 	}
-	
+	# Notice that by default, data.type is set to WHO 2012. 
+	# This is only consequential to the codings are done. 
+	# It does not take over the probbase from training data, 
+	#   because customization.dev is set to TRUE.
 	fit <- insilico.fit(data = data, 
 						isNumeric = isNumeric, 
 						updateCondProb = updateCondProb, 

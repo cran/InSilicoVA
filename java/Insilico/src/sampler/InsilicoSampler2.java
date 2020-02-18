@@ -365,7 +365,7 @@ public class InsilicoSampler2 {
         for(int s=0; s<this.S; s++){
             for(int c=0; c < this.C; c++){new_probbase[c][s] = this.probbase[s][c];}
         }
-        // loop over causes c
+        // loop over symptoms s
         for( int s = 0; s < this.S; s++){
             // find which level-symptom combinations under this cause
             HashMap<Integer, ArrayList<Integer>> levels_under_s = this.probbase_level.get(s);

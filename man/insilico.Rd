@@ -4,7 +4,7 @@
 \alias{insilico}
 \title{Implement InSilicoVA methods}
 \usage{
-insilico(data, data.type = c("WHO2012", "WHO2016")[1],
+insilico(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL,
   isNumeric = FALSE, updateCondProb = TRUE,
   keepProbbase.level = TRUE, CondProb = NULL, CondProbNum = NULL,
   datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE,
@@ -33,6 +33,9 @@ the death ID. For example input data format, see \code{RandomVA1} and
 \code{RandomVA2}.}
 
 \item{data.type}{Type of questionnaire. ``WHO2012'' corresponds to the standard input of InterVA4, and  ``WHO2016'' corresponds to the standard input of InterVA5.}
+
+\item{sci}{A data frame that contains the symptom-cause-information (aka
+Probbase) that InterVA uses to assign a cause of death.}
 
 \item{isNumeric}{Indicator if the input is already in numeric form. If the
 input is coded numerically such that 1 for ``present'', 0 for ``absent'',

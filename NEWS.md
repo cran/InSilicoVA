@@ -1,5 +1,14 @@
 # InSilicoVA - changes
 
+Version 1.2.6 (2020-02-17, on CRAN)
+==========================
++ Include function to load the latest P(S|C) from InterVA-5 software
+
+Version 1.2.6 (2018-12-10, on GitHub)
+==========================
++ Bug fix for model with customized P(S|C)
++ Bug fix for scenario where all deaths due to external causes in WHO 2016 format.
+
 Version 1.2.5 (2018-10-28)
 ==========================
 + Bug fix for subsetting data with (1) no external causes, and (2) only external causes.

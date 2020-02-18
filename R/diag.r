@@ -121,9 +121,9 @@ csmf.diag <- function(csmf, conv.csmf = 0.02, test= c("gelman", "heidel")[2], ve
 	
 	
 	# check if the input is insilico object or only csmf
-	if(class(csmf) == "insilico"){
+	if(methods::is(csmf, "insilico")){
 		if(csmf$external){
-			if(class(csmf$csmf) == "list"){			
+			if(methods::is(csmf$csmf, "list")){			
 				for(i in 1:length(csmf$csmf)){
 					csmf$csmf[[i]] <- csmf$csmf[[i]][ , -csmf$external.causes]
 				}	
@@ -138,8 +138,8 @@ csmf.diag <- function(csmf, conv.csmf = 0.02, test= c("gelman", "heidel")[2], ve
 	}  
 
 	# check if input is multiple insilico object, without sub population
-	if(class(csmf) == "list" && class(csmf[[1]]) == "insilico" 
-							 && class(csmf[[1]]$csmf) != "list" ){
+	if(methods::is(csmf, "list") && methods::is(csmf[[1]], "insilico") 
+							 && (!methods::is(csmf[[1]]$csmf, "list")) ){
 		csmf_only <- vector("list", length(csmf))
 		for(i in 1:length(csmf)){
 			if(csmf[[i]]$external){
@@ -151,8 +151,8 @@ csmf.diag <- function(csmf, conv.csmf = 0.02, test= c("gelman", "heidel")[2], ve
 		csmf <- csmf_only
 	}
 	# check if input is multiple insilico object, with sub population
-	if(class(csmf) == "list" && class(csmf[[1]]) == "insilico" 
-							 && class(csmf[[1]]$csmf) == "list" ){
+	if(methods::is(csmf, "list") && methods::is(csmf[[1]], "insilico") 
+							 && methods::is(csmf[[1]]$csmf, "list") ){
 		csmf_only <- vector("list", length(csmf))
 		if(is.null(which.sub)){
 			stop("Need to specify which sub-population to test")
@@ -171,7 +171,7 @@ csmf.diag <- function(csmf, conv.csmf = 0.02, test= c("gelman", "heidel")[2], ve
 	if(conv.csmf >= 1 || conv.csmf <= 0) {
 		stop("Invalid threshold.")
 	}
-	if(test == "gelman" && class(csmf) != "list"){
+	if(test == "gelman" && (!methods::is(csmf, "list"))){
 		stop("Need more than one chain to perform Gelman and Rubin's test.")
 	}
 	gelman.single <- function(list, conv.csmf){
@@ -217,7 +217,7 @@ csmf.diag <- function(csmf, conv.csmf = 0.02, test= c("gelman", "heidel")[2], ve
 	if(test == "heidel"){
 		testout <- NULL
 		conv <- 1
-		if(class(csmf) == "list"){
+		if(methods::is(csmf, "list")){
 			testout <- vector("list", length(csmf))
 			names(testout) <- names(csmf)
 			for(i in 1:length(testout)){
@@ -233,7 +233,7 @@ csmf.diag <- function(csmf, conv.csmf = 0.02, test= c("gelman", "heidel")[2], ve
 	if(test == "gelman"){
 		testout <- NULL
 		conv <- 1
-		if(class(csmf[[1]]) == "list"){
+		if(methods::is(csmf[[1]], "list")){
 			testout <- vector("list", length(csmf[[1]]))
 			names(testout) <- names(csmf[[1]])
 			for(i in 1:length(testout)){

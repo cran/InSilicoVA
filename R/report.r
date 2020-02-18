@@ -90,7 +90,7 @@ summary.insilico <- function(object, CI.csmf = 0.95, CI.cond = 0.95, file = NULL
 	# organize CSMF
 	ci.low <- (1 - CI.csmf) / 2
 	ci.up <- 1 - ci.low
-	if(class(object$csmf) == "list"){
+	if(methods::is(object$csmf, "list")){
 		csmf.out <- vector("list", length(csmf))
 		csmf.out.ordered <- vector("list", length(csmf))
 		for(i in 1:length(csmf)){

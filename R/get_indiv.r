@@ -61,7 +61,7 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 			data$sub <- "All"
 			col.index <- which(colnames(data) == "sub")
 		}else{
-			if(class(by) != "list"){
+			if(!methods::is(by, "list")){
 				stop("Please specify by variable using list, see manual example for details.")
 			}else{
 				col.index <- match(by, colnames(data))

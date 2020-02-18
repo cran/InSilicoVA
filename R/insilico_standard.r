@@ -48,6 +48,8 @@
 #' the death ID. For example input data format, see \code{RandomVA1} and 
 #' \code{RandomVA2}.
 #' @param data.type Type of questionnaire. ``WHO2012'' corresponds to the standard input of InterVA4, and  ``WHO2016'' corresponds to the standard input of InterVA5.
+#' @param sci A data frame that contains the symptom-cause-information (aka
+#' Probbase) that InterVA uses to assign a cause of death.
 #' @param isNumeric Indicator if the input is already in numeric form. If the
 #' input is coded numerically such that 1 for ``present'', 0 for ``absent'',
 #' and -1 for ``missing'', this indicator could be set to True to avoid
@@ -179,6 +181,7 @@
 #' @import coda
 #' @import ggplot2
 #' @import InterVA5
+#' @import methods
 #' @importFrom stats median quantile rbinom reorder runif
 #' @importFrom utils write.csv
 #' @importFrom stats ecdf
@@ -346,7 +349,7 @@
 #' 
 #' }
 #' @export insilico
-insilico <- function(data, data.type = c("WHO2012", "WHO2016")[1], isNumeric = FALSE, 
+insilico <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL, isNumeric = FALSE, 
   updateCondProb = TRUE, keepProbbase.level = TRUE,
   CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, 
   warning.write = FALSE, directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, 
@@ -364,7 +367,7 @@ insilico <- function(data, data.type = c("WHO2012", "WHO2016")[1], isNumeric = F
 	  	message("length.sim argument is replaced with Nsim argument, will remove in later versions.\n")
 	  }
 
-	  if(class(exclude.impossible.cause) == "logical"){
+	  if(methods::is(exclude.impossible.cause, "logical")){
 	  	if(exclude.impossible.cause){
 	  		exclude.impossible.cause <- "subset"
 	  	}else{
@@ -376,6 +379,7 @@ insilico <- function(data, data.type = c("WHO2012", "WHO2016")[1], isNumeric = F
 
 	fit <- insilico.fit(data = data, 
 						data.type = data.type,
+						sci = sci,
 						isNumeric = isNumeric, 
 						updateCondProb = updateCondProb, 
 						keepProbbase.level = keepProbbase.level, 
