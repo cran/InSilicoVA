@@ -87,6 +87,8 @@ stackplot <- function(x, grouping = NULL,
 	err_width = .4, err_size = .6, point_size = 2, 
 	border = "black", bw = FALSE, ...){
 	
+	if(type %in% c("stack", "dodge")==FALSE) stop("type needs to be either 'stack' or 'dodge'.")
+
 
 	if(is.null(grouping)){
 		data("SampleCategory", envir = environment())

@@ -109,7 +109,7 @@ physician_debias <- function(data, phy.id, phy.code, phylist, causelist, tol = 0
 	if(sum(tolower(as.vector(W.raw)) %in% c("y", "", ".") == FALSE) > 0){
 		stop("Input may contain additional columns other than symptoms, physician IDs and physician codes. Please remove the additional columns, or check the coding of symptoms are correct.")
 	}
-	W[which(W.raw == "Y")] <- 1
+	W[which(W.raw %in% c("Y", "y"))] <- 1
 	W[which(W.raw == ".")] <- -1
 	noSymp <- which(apply(W, 2, sum) + A == 0)
 	N <- N - length(noSymp)

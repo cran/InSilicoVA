@@ -101,6 +101,8 @@ indivplot <- function(x, type = c("errorbar", "bar")[1],
 	border = "black", bw = FALSE, ...){
 	
 
+	if(type %in% c("errorbar", "bar")==FALSE) stop("type needs to be either 'errorbar' or 'bar'.")
+
 	
 	if(methods::is(x, "list") && is.null(which.plot)){
 		compare <- TRUE

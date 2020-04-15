@@ -72,6 +72,7 @@ insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NUL
   	Nsim <- args$length.sim
   	message("length.sim argument is replaced with Nsim argument, will remove in later versions.\n")
   }
+  data.type <- toupper(data.type)
 
   ## Add java system check
   jv <- .jcall("java/lang/System", "S", "getProperty", "java.runtime.version")
@@ -79,9 +80,11 @@ insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NUL
 	  jvn <- as.numeric(paste0(strsplit(jv, "[.]")[[1L]][1:2], collapse = "."))
 	  if(jvn < 1.7) stop("Java >= 7 is needed for this package but not available")
    }
+  if(is.null(java_option)) java_option = "-Xmx1g"
+  options( java.parameters = java_option )
 
-  if(data.type == "WHO2016" & "i183o" %in% colnames(data)){
-  	colnames(data)[which(colnames(data) == "i183o")] <- "i183a"
+  if(data.type == "WHO2016" & "i183o" %in% tolower(colnames(data))){
+  	colnames(data)[which(tolower(colnames(data)) == "i183o")] <- "i183a"
   	message("Due to the inconsistent names in the early version of InterVA5, the indicator 'i183o' has been renamed as 'i183a'.")
   }
   if(!is.null(directory)){
@@ -564,34 +567,6 @@ removeExtV5 <- function(data, prob.orig, csmf.orig, is.Numeric, subpop, subpop_o
 	probsub <- change.inter(prob.orig[external.symps, external.causes])
 	csmfsub <- change.inter(csmf.orig[external.causes])
 
-	# a smaller scale datacheck for external causes
-	# extData[which(extData[,2] == pos), c(3, 5, 7, 10, 11, 13)] <- neg
-	# extData[which(extData[,3] == pos), c(2, 5, 7, 10, 11, 13)] <- neg
-	# extData[which(extData[,4] == pos), c(5, 7, 11, 13)] <- neg
-	# extData[which(extData[,5] == pos), c(2,3,4,8,9,15)] <- neg
-	# extData[which(extData[,6] == pos), c(5,9,13,15)] <- neg
-	# extData[which(extData[,7] == pos), c(2,3,5,6,8,9,11,15)] <- neg
-	# extData[which(extData[,8] == pos), c(5,7,9,11,15)] <- neg
-	# extData[which(extData[,9] == pos),c(5,7,8,11,12,13,14,15)] <- neg
-	# extData[which(extData[,15] == pos),c(5,7,8)] <- neg
-	# extData[which(extData[,18] == pos),c(15)] <- neg
-	# extData[which(extData[,19] == pos),c(3,15)] <- neg
-	
-	# initialize with all "unspecified ext causes"
-	# ext.cod <- rep(extCauses[11], length(ext.id))
-	# # begin checking symptoms
-	# ext.cod[which(extData[,2] == pos)] <- extCauses[1]
-	# ext.cod[which(extData[,3] == pos)] <- extCauses[2]
-	# ext.cod[which(extData[,4] == pos)] <- extCauses[3]
-	# ext.cod[which(extData[,5] == pos)] <- extCauses[7]
-	# ext.cod[which(extData[,6] == pos)] <- extCauses[4]
-	# ext.cod[which(extData[,9] == pos)] <- extCauses[5]
-	# ext.cod[which(extData[,7] == pos)] <- extCauses[6]
-	# ext.cod[which(extData[,10] == pos)] <- extCauses[9]
-	# ext.cod[which(extData[,19] == pos)] <- extCauses[9]
-	# ext.cod[which(extData[,15] == pos)] <- extCauses[10]
-	# ext.cod[which(extData[,18] == pos)] <- extCauses[8]
-
 	# delete the causes from probbase
 	prob.orig <- prob.orig[ -(extSymps), -(extCauses)]
 	negate <- negate[-extSymps]
@@ -750,9 +725,9 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		data[data == ""] <- "."
 	}
 
-	if(is.null(java_option)) java_option = "-Xmx1g"
-	options( java.parameters = java_option )
+
 	obj <- .jnew("sampler/InsilicoSampler2")
+	if(is.null(obj)) stop("Java error: failed to initialize")
 
 	time0 <- Sys.time()
 	# method <- tolower(method)
@@ -797,7 +772,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		probbase[which(probbase=="sk_les")] <- "skin_les"
 		data("causetext", envir = environment())
 		causetext<- get("causetext", envir  = environment())		
-	}else{
+	}else if(data.type == "WHO2016"){
 	    if (is.null(sci)) {
 	        data("probbaseV5", envir = environment())
 	        probbaseV5 <- get("probbaseV5", envir = environment())
@@ -865,11 +840,12 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		  	negate <- rep(FALSE, dim(prob.orig)[1])
 			if(dim(data)[2] != dim(probbase)[1] ){
 		  		correct_names <- probbase[2:246, 2]
-		  		exist <- correct_names %in% colnames(data)
+		  		exist <- correct_names %in% tolower(colnames(data))
 		  		if(length(which(exist == FALSE)) > 0){
 			        stop(paste("error: invalid data input format. Symptom(s) not found:", correct_names[!exist]))
 		  		}else{
-		  			data <- data[, c(1, match(correct_names, colnames(data)))]
+		  			data <- data[, c(1, match(correct_names, tolower(colnames(data))))]
+		  			colnames(data)[-1] <- tolower(colnames(data)[-1])
 		  		}
 	    	}
 	    	## check the column names and give warning
@@ -889,11 +865,13 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 
 		  	if(dim(data)[2] != dim(probbase)[1] ){
 		  		correct_names <- probbase[2:354, 1]
-		  		exist <- correct_names %in% colnames(data)
+		  		exist <- correct_names %in% tolower(colnames(data))
 		  		if(length(which(exist == FALSE)) > 0){
 			        stop(paste("error: invalid data input format. Symptom(s) not found:", correct_names[!exist]))
 		  		}else{
-		  			data <- data[, c(1, match(correct_names, colnames(data)))]
+		  			data <- data[, c(1, match(correct_names, tolower(colnames(data))))]
+		  			colnames(data)[-1] <- tolower(colnames(data)[-1])
+
 		  		}
 	    	}
 	    	## check the column names and give warning
@@ -1002,7 +980,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 			checked <- datacheck.interVAJava(data, obj,warning.write, dir_err)
 			warning <- NULL
 			offset <- 0
-		}else{
+		}else if(data.type == "WHO2016"){
 			# code missing as NA
 			checked <- datacheck.interVA5(data, obj, warning.write, probbase)
 			
@@ -1120,11 +1098,6 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		##----------------------------------------------------------##
 		## with developer customization		
 		##----------------------------------------------------------##
-	 	# TODO: make sure this is ok 
-	 	# if(!is.null(prob.order.dev)){
-	  	# 		prob.order <- prob.order.dev
-	  	# 		cond.prob.true <- prob.orig
-	  	# 	}else{
 	  	if(updateCondProb){
 	 		prob.order <- change.inter(prob.orig, order = TRUE, standard = FALSE, table.dev = table.dev, table.num.dev = table.num.dev)
 	  		cond.prob.true <- change.inter(prob.orig, order = FALSE, standard = FALSE, table.dev = table.dev, table.num.dev = table.num.dev)

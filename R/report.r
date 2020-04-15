@@ -198,7 +198,8 @@ summary.insilico <- function(object, CI.csmf = 0.95, CI.cond = 0.95, file = NULL
 				 showTop = top, 
 				 id = id, 
 				 indiv.prob = indiv.prob, 
-				 indiv.CI = object$indiv.CI)
+				 indiv.CI = object$indiv.CI,
+				 data.type=object$data.type)
 	class(out) <- "insilico_summary"
 	return(out)
 }

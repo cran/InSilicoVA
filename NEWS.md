@@ -1,5 +1,10 @@
 # InSilicoVA - changes
 
+Version 1.2.8 (2020-04-14)
+==========================
++ Minor improvements in summary display.
++ Minor stability improvements in checking input formats.
+
 Version 1.2.7 (2020-02-18)
 ==========================
 + Include system checks for Java version at least 7.0.

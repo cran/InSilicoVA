@@ -57,7 +57,8 @@ print.insilico_summary <- function(x, ...) {
 				cat("Fitted with re-estimating conditional probability matrix\n")	
 			}   
 		if(x$datacheck){
-			cat("Data consistency check performed as in InterVA4 \n")
+			interva.version <- ifelse(x$data.type == "WHO2012", "InterVA4", "InterVA5")
+			cat(paste0("Data consistency check performed as in ", interva.version,  "\n"))
 		}
 
 		if(!is.null(x$subpop_counts)){

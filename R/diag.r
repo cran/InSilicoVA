@@ -118,7 +118,7 @@
 #' 
 #' @export csmf.diag
 csmf.diag <- function(csmf, conv.csmf = 0.02, test= c("gelman", "heidel")[2], verbose = TRUE, autoburnin = FALSE, which.sub = NULL, ...){
-	
+	if(test %in% c("gelman", "heidel")==FALSE) stop("test needs to be either 'gelman' or 'heidel'.")
 	
 	# check if the input is insilico object or only csmf
 	if(methods::is(csmf, "insilico")){
