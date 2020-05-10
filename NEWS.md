@@ -1,5 +1,9 @@
 # InSilicoVA - changes
 
+Version 1.2.9 (2020-05-07) 
+==========================
++ fix bug with subpop specification in WHO2016 input
+
 Version 1.2.8 (2020-04-14)
 ==========================
 + Minor improvements in summary display.

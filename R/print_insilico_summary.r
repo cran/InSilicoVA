@@ -40,7 +40,7 @@ print.insilico_summary <- function(x, ...) {
 	if(!is.null(x$indiv.prob)){
 		cat(paste0("InSilicoVA fitted top ", x$top, " causes for death ID: ", x$id, "\n"))		
 		cat(paste0("Credible intervals shown: ", round(x$indiv.CI * 100), "%\n"))
-		print(x$indiv.prob, digits = 4)
+		print(round(x$indiv.prob, 4), digits = 4)
 
 	# print population summary
 	}else{

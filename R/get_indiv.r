@@ -178,10 +178,16 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 	if(!is.aggregate){
 		message("Calculating individual COD distributions...\n")
 		# return rbind(mean, median, low, up), (4N) * C matrix
-		indiv  <- .jcall(obj, "[[D", "IndivProb", 
+		indiv <- try( 
+			 .jcall(obj, "[[D", "IndivProb", 
 					 data.j, impossible.j, csmf.j, subpop.j, condprob.j, 
 					 (1 - CI)/2, 1-(1-CI)/2, 
 					 Nsub, Nitr, C, S)
+			, FALSE)
+		if(is(indiv, "try-error")){
+			java_message()	
+			stop()
+		}
 		indiv <- do.call(rbind, lapply(indiv, .jevalArray))
 		
 		# if not customized probbase, use longer cause names for output
@@ -233,10 +239,17 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 	}else{
 		message("Aggregating individual COD distributions...\n")
 		# return (4 x Ngroup) * (C + 1) matrix, last column is sample size
-		indiv  <- .jcall(obj, "[[D", "AggIndivProb", 
+
+		indiv <- try( 
+			.jcall(obj, "[[D", "AggIndivProb", 
 					 data.j, impossible.j, csmf.j, subpop.j, condprob.j,
 					 datagroup.j, Ngroup, (1 - CI)/2, 1-(1-CI)/2, 
 					 Nsub, Nitr, C, S)
+			, FALSE)
+		if(is(indiv, "try-error")){
+			java_message()	
+			stop()
+		}
 		indiv <- do.call(rbind, lapply(indiv, .jevalArray))
 		if(object$data.type == "WHO2012"){
 				data("causetext", envir = environment())
