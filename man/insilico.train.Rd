@@ -15,7 +15,8 @@ insilico.train(data, train, cause, causes.table = NULL, thre = 0.95,
   java_option = "-Xmx1g", seed = 1, phy.code = NULL,
   phy.cat = NULL, phy.unknown = NULL, phy.external = NULL,
   phy.debias = NULL, exclude.impossible.cause = TRUE,
-  impossible.combination = NULL, indiv.CI = NULL, ...)
+  impossible.combination = NULL, indiv.CI = NULL,
+  CondProbTable = NULL, ...)
 }
 \arguments{
 \item{data}{The original data to be used. It is suggested to use similar
@@ -113,6 +114,8 @@ re-estimating conditional probabilities.}
 \item{impossible.combination}{a matrix of two columns, first is the name of symptoms, and the second is the name of causes. Each row corresponds to a combination of impossible symptom (that exists) and cause.}
 
 \item{indiv.CI}{see \code{\link{insilico}} for more detail.}
+
+\item{CondProbTable}{a data frame of two columns: one alphabetic level of the CondProb argument and one numerical value corresponding to the numerical value of each level. Only used when only conditional probabilities are provided instead of training data.}
 
 \item{...}{not used}
 }

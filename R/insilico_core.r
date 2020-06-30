@@ -65,7 +65,7 @@
 #' @keywords InSilicoVA
 #' 
 #' @export insilico.fit
-insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL, isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = c("subset", "all", "InterVA", "none")[1], impossible.combination = NULL, no.is.missing = FALSE, customization.dev = FALSE, Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, groupcode=FALSE, ...){ 
+insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL, isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = c("subset2", "subset", "all", "InterVA", "none")[1], impossible.combination = NULL, no.is.missing = FALSE, customization.dev = FALSE, Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, groupcode=FALSE, ...){ 
   # handling changes throughout time
   args <- as.list(match.call())
   if(!is.null(args$length.sim)){
@@ -73,6 +73,10 @@ insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NUL
   	message("length.sim argument is replaced with Nsim argument, will remove in later versions.\n")
   }
   data.type <- toupper(data.type)
+
+  if(!datacheck && data.type == "WHO2016"){
+  	warning("Data check is turned off. Please be very careful with this, because some indicators needs to be negated in the data check steps (i.e., having symptom = Yes turned into not having symptom = No). Failed to properly negate all such symptoms will lead to erroneous inference.")
+  }
 
   ## Add java system check
   jv <- .jcall("java/lang/System", "S", "getProperty", "java.runtime.version")
@@ -1018,10 +1022,21 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 			data[which(checked[, i+offset] == 0), i+1] <- ""
 			data[which(checked[, i+offset] == -1), i+1] <- "." # for 2012 (2012 does not have negate, so -1 is fine)
 			data[which(is.na(checked[, i+offset])), i+1] <- "." # for 2016 (NA after negate is still fine)
-		}	
+		}
+		# Notice that this is the negated data
+		data.checked <- data
+		if(data.type=="WHO2016"){
+			for(i in 2:(dim(data.checked)[2])){
+				data.checked[which(data.checked[, i] == "Y"), i] <- "y"
+				data.checked[which(data.checked[, i] == ""), i] <- "n"
+				data.checked[which(data.checked[, i] == "."), i] <- "-"
+			}
+		}
   	}else{
   		warning <- NULL
+  		data.checked <- NULL
   	}
+
   	if(length(data) == 0) stop("All deaths failed data checks. Please double check your input data.")
   	## remove external causes
   	if(external.sep){
@@ -1137,9 +1152,13 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 	## check impossible pairs of symptoms and causes
   	## check only first demographic symptoms (7 age + 2 gender)
   	## also the value saved is the index (starting from 1)
+  	## format: 
+  	##		   (ss, cc, 0) if P(cc | ss = y) = 0
+  	##         (ss, cc, 1) if P(cc | ss = n) = 0
+  	##
   	if(exclude.impossible.cause != "none" && (!customization.dev)){
 	  	impossible <- NULL
-	  	if(exclude.impossible.cause == "subset"){
+	  	if(exclude.impossible.cause == "subset2" || exclude.impossible.cause == "subset"){
 	  		if(data.type == "WHO2012"){
 		  	demog.set <- c("elder", "midage", "adult", "child", "under5", "infant", "neonate", "male", "female", 
 		  		"magegp1", "magegp2", "magegp3", "died_d1", "died_d23", "died_d36", "died_w1", "no_life")
@@ -1163,7 +1182,29 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 				}
 			}
 		}
+		
+		# Add prematurity fix
+		if(exclude.impossible.cause  == "subset2"){
+			if(data.type == "WHO2012"){
+		 	 	s.set <- "born_38"
+				ss <- match(s.set, colnames(data)[-1])
+				val.onlyprem <- as.integer(0)
+				val.notprem <- as.integer(1)
+	  		}else{
+	  			s.set <- "i367a"
+				ss <- match(s.set, colnames(data)[-1])
+				# if negated, then reverse 
+	  			val.onlyprem <- ifelse(negate[ss], as.integer(1), as.integer(0)) 
+	  			val.notprem <- ifelse(negate[ss], as.integer(0), as.integer(1)) 
+	  		}
+	 	 	cc.onlyprem <- match("Prematurity", vacauses.current)
+	 	 	cc.notprem <- match("Birth asphyxia", vacauses.current)
+			if(!is.na(ss) && !is.na(cc.onlyprem)) impossible <- rbind(impossible, c(as.integer(cc.onlyprem), as.integer(ss), val.onlyprem))
+			if(!is.na(ss) && !is.na(cc.notprem)) impossible <- rbind(impossible, c(as.integer(cc.notprem), as.integer(ss), val.notprem))
+		} 
+
 		impossible <- as.matrix(impossible)	
+
 	}else if(!is.null(impossible.combination) && exclude.impossible.cause){
 		impossible <- NULL
 		for(ii in 1:dim(impossible.combination)){
@@ -1688,7 +1729,8 @@ rownames(cleandata) <- id[1:dim(cleandata)[1]]
 
 out <- list(
 		id = id,
-		data = cleandata,
+		data.final = cleandata,
+		data.checked = data.checked,
 	    indiv.prob = p.indiv, 
 		csmf = p.hat,
 		conditional.probs = probbase.gibbs,

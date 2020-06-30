@@ -365,7 +365,7 @@ public class InsilicoSampler2 {
         for(int s=0; s<this.S; s++){
             for(int c=0; c < this.C; c++){new_probbase[c][s] = this.probbase[s][c];}
         }
-        // loop over symptoms s
+        // loop over causes c
         for( int s = 0; s < this.S; s++){
             // find which level-symptom combinations under this cause
             HashMap<Integer, ArrayList<Integer>> levels_under_s = this.probbase_level.get(s);
@@ -664,7 +664,7 @@ public class InsilicoSampler2 {
                     broader);
         }
 
-        System.out.printf("InSilico Sampler initiated, %d iterations to sample\n", N_gibbs);
+        System.out.printf("InSilicoVA Sampler Initiated, %d Iterations to Sample\n", N_gibbs);
         // list of random number generators to use
         DoubleRandomEngine rngEngine=new DoubleMersenneTwister(seed);
         Normal rngN=new Normal(0.0,1.0,rngEngine);
@@ -730,7 +730,7 @@ public class InsilicoSampler2 {
         }
 
         // check impossible causes?
-        boolean check_impossible = impossible[0].length == 2;
+        boolean check_impossible = impossible[0].length == 3;
         int[][] zero_matrix = new int[N][C];
         for(int i = 0; i < N; i++){
             for(int j = 0; j < C; j++){
@@ -740,7 +740,10 @@ public class InsilicoSampler2 {
         if(check_impossible){
             for(int i = 0; i < N; i++){
                 for(int k = 0; k < impossible.length; k++){
-                    if(indic[i][impossible[k][1] - 1] == 1){
+                    if(indic[i][impossible[k][1] - 1] == 1 & impossible[k][2] == 0){
+                        zero_matrix[i][impossible[k][0] - 1] = 0;
+                    }
+                    if(indic[i][impossible[k][1] - 1] == 0 & impossible[k][2] == 1){
                         zero_matrix[i][impossible[k][0] - 1] = 0;
                     }
                 }
@@ -850,17 +853,13 @@ public class InsilicoSampler2 {
                 double[] theta_prev = theta_now[sub];
                 theta_now[sub] = insilico.thetaBlockUpdate(jumprange, mu_now[sub],
                         sigma2_now[sub], theta_prev, Y[sub], false, rngN, rand, zero_group_matrix[sub]);
-                int j = 0;
-                while(j < theta_prev.length){
-                    if(theta_now[sub][j] > 0){
+
+                for(int j = 0; j < theta_prev.length; j++){
                         if(theta_now[sub][j] != theta_prev[j]){
                             naccept[sub] += 1;
-                            j = theta_prev.length + 1;
+                            break;
                         }
-                    }else{
-                        j++;
-                    }
-                }
+                  }
 
                 // calculate phat
                 double expsum = 0.0;

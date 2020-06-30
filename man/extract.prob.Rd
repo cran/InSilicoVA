@@ -5,7 +5,7 @@
 \title{Obtain conditional probabilities from training data}
 \usage{
 extract.prob(train, gs, gstable, thre = 0.95, type = c("quantile",
-  "fixed", "empirical")[1], isNumeric = FALSE)
+  "fixed", "empirical")[1], isNumeric = FALSE, impute = TRUE)
 }
 \arguments{
 \item{train}{Training data, it should be in the same format as the testing data
@@ -31,6 +31,8 @@ in the default InterVA P(S|C) table. Empirically both types of rankings produce 
 input is coded numerically such that 1 for ``present'', 0 for ``absent'',
 and -1 for ``missing'', this indicator could be set to True to avoid
 conversion to standard InterVA format.}
+
+\item{impute}{Indicator for whether to impute 1. P(S|C) with P(S) if symptom S does not exist more than the threshold of fractions within death due to C; and 2. values of exact 0 or 1.}
 }
 \value{
 \item{cond.prob}{raw P(S|C) matrix}

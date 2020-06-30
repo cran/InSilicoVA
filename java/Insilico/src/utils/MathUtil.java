@@ -14,7 +14,7 @@ public class MathUtil {
 		double sumx = 0;
 		for(int i = 0; i < x.length; i++) sumx += x[i];
 		if(sumx == 0){
-			for(int i = 0 ; i < xnorm.length; i++) xnorm[i] = 1;
+			for(int i = 0 ; i < xnorm.length; i++) xnorm[i] = 0;
 		}else{
 			for(int i = 0; i < xnorm.length; i++) xnorm[i] = x[i] / sumx;
 		}

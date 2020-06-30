@@ -14,8 +14,8 @@ insilico(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL,
   trunc.min = 1e-04, trunc.max = 0.9999, subpop = NULL,
   java_option = "-Xmx1g", seed = 1, phy.code = NULL,
   phy.cat = NULL, phy.unknown = NULL, phy.external = NULL,
-  phy.debias = NULL, exclude.impossible.cause = c("subset", "all",
-  "InterVA", "none")[1], no.is.missing = FALSE, indiv.CI = NULL,
+  phy.debias = NULL, exclude.impossible.cause = c("subset2", "subset",
+  "all", "InterVA", "none")[1], no.is.missing = FALSE, indiv.CI = NULL,
   groupcode = FALSE, ...)
 }
 \arguments{
@@ -148,7 +148,7 @@ are assigned deterministically by the corresponding symptoms.}
 \item{phy.debias}{Fitted object from physician coding debias function (see
 \code{\link{physician_debias}}) that overwrites \code{phy.code}.}
 
-\item{exclude.impossible.cause}{option to exclude impossible causes at the individual level. The following rules are implemented: \code{subset}: Causes with 0 probability given the age group and gender of the observation, according to the InterVA conditional probabilities, are removed; \code{all}: Causes with 0 probability given any symptom of the observation, according to the InterVA conditional probabilities, are removed; \code{interVA}:  Causes with 0 probability given any positive indicators according to the InterVA conditional probabilities, are removed; and \code{none}: no causes are removed.}
+\item{exclude.impossible.cause}{option to exclude impossible causes at the individual level. The following rules are implemented: \code{subset}: Causes with 0 probability given the age group and gender of the observation, according to the InterVA conditional probabilities, are removed; \code{subset2}: In addition to the same rules as \code{subset}, also remove Prematurity for baby born during at least 37 weeks of pregnancy and remove Birth asphyxia for baby  not born during at least 37 weeks of pregnancy; \code{all}: Causes with 0 probability given any symptom of the observation, according to the InterVA conditional probabilities, are removed; \code{interVA}:  Causes with 0 probability given any positive indicators according to the InterVA conditional probabilities, are removed; and \code{none}: no causes are removed. \code{subset2} is the default.}
 
 \item{no.is.missing}{logical indicator to treat all absence of symptoms as missing. Default to FALSE. If set to TRUE, InSilicoVA will perform calculations similar to InterVA-4 w.r.t treating absent symptoms. It is highly recommended to set this argument to FALSE.}
 

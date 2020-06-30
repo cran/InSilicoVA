@@ -70,12 +70,13 @@
 #' @param exclude.impossible.cause Whether to include impossible causes
 #' @param impossible.combination a matrix of two columns, first is the name of symptoms, and the second is the name of causes. Each row corresponds to a combination of impossible symptom (that exists) and cause.
 #' @param indiv.CI see \code{\link{insilico}} for more detail.
+#' @param CondProbTable a data frame of two columns: one alphabetic level of the CondProb argument and one numerical value corresponding to the numerical value of each level. Only used when only conditional probabilities are provided instead of training data.
 #' @param ... not used
 #'
 #' @return \code{insilico} object
 #' @export insilico.train
 #' 
-insilico.train <- function(data, train, cause, causes.table = NULL, thre = 0.95, type = c("quantile", "fixed", "empirical")[1], isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = NULL, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE, impossible.combination = NULL, indiv.CI = NULL, ...){ 
+insilico.train <- function(data, train, cause, causes.table = NULL, thre = 0.95, type = c("quantile", "fixed", "empirical")[1], isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = NULL, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = TRUE, impossible.combination = NULL, indiv.CI = NULL, CondProbTable=NULL, ...){ 
 	  
 	  # handling changes throughout time
 	  args <- as.list(match.call())
@@ -84,33 +85,64 @@ insilico.train <- function(data, train, cause, causes.table = NULL, thre = 0.95,
 	  	message("length.sim argument is replaced with Nsim argument, will remove in later versions.\n")
 	  }
 
-	prob.learn <- extract.prob(train = train, 
+	if(!is.null(train)){
+		prob.learn <- extract.prob(train = train, 
 							  gs = cause, 
 							  gstable = causes.table, 
 							  thre = thre, 
 							  type = type, 
 							  isNumeric = isNumeric)
-	# remove unused symptoms
-	col.exist <- c(colnames(data)[1], cause, colnames(prob.learn$symps.train))
-	remove <- which(colnames(data) %in% col.exist == FALSE)
-	if(length(remove) > 0){
-		warning(paste(length(remove), "symptoms deleted from testing data to match training data:", 
-			paste(colnames(data)[remove], collapse = ", ")),
-			immediate. = TRUE)	
-		data <- data[, -remove]
-	}
-	if(type == "empirical"){
-		cat("Empirical conditional probabilities are used, so updateCondProb is forced to be FALSE.")
-		updateCondProb <- FALSE
-	}
-	if(updateCondProb){
-		probbase.touse <- prob.learn$cond.prob.alpha
-		CondProbNum <- NULL
+		# remove unused symptoms
+		col.exist <- c(colnames(data)[1], cause, colnames(prob.learn$symps.train))
+		remove <- which(colnames(data) %in% col.exist == FALSE)
+		if(length(remove) > 0){
+			warning(paste(length(remove), "symptoms deleted from testing data to match training data:", 
+				paste(colnames(data)[remove], collapse = ", ")),
+				immediate. = TRUE)	
+			data <- data[, -remove]
+		}
+		if(type == "empirical"){
+			cat("Empirical conditional probabilities are used, so updateCondProb is forced to be FALSE.")
+			updateCondProb <- FALSE
+		}
+		if(updateCondProb){
+			probbase.touse <- prob.learn$cond.prob.alpha
+			CondProbNum <- NULL
+		}else{
+			probbase.touse <- prob.learn$cond.prob
+			CondProbNum <- prob.learn$cond.prob
+		}
+		table.alpha <- prob.learn$table.alpha
+		table.num <- prob.learn$table.num
 	}else{
-		probbase.touse <- prob.learn$cond.prob
-		CondProbNum <- prob.learn$cond.prob
+		# remove unused symptoms
+		col.exist <- c(colnames(data)[1], cause, rownames(CondProb))
+		remove <- which(colnames(data) %in% col.exist == FALSE)
+		if(length(remove) > 0){
+			warning(paste(length(remove), "symptoms deleted from testing data to match training data:", 
+				paste(colnames(data)[remove], collapse = ", ")),
+				immediate. = TRUE)	
+			data <- data[, -remove]
+		}
+		if(type == "empirical"){
+			cat("Empirical conditional probabilities are used, so updateCondProb is forced to be FALSE.")
+			updateCondProb <- FALSE
+		}
+		if(updateCondProb){
+			probbase.touse <- CondProb
+			CondProbNum <- NULL
+			if(is.null(probbase.touse)) stop("Need CondProb: the alphabetical probbase matrix")
+		}else{
+			probbase.touse <- CondProbNum
+			if(is.null(CondProbNum)) stop("Need CondProbNum: the numerical probbase matrix")
+		}
+		if(is.null(CondProbTable) || dim(CondProbTable)[2] != 2) stop("Need CondProbTable: the table of conditional probabilities (one column of letter values and one column of numerical values)")
+		num <- ifelse(is.numeric(CondProbTable[1,1]), 1, 2)
+		CondProbTable <- CondProbTable[order(CondProbTable[, num], decreasing = TRUE), ]
+		table.alpha = CondProbTable[, 3-num]
+		table.num <- CondProbTable[, num]
 	}
-
+	
 	# default levels.strength for two different P(S|C) extraction
 	if(is.null(levels.strength)){
 	  if(type == "empirical"){
@@ -160,9 +192,9 @@ insilico.train <- function(data, train, cause, causes.table = NULL, thre = 0.95,
 						customization.dev = TRUE, 
 						Probbase_by_symp.dev = FALSE, 
 						probbase.dev = probbase.touse, 
-						table.dev = prob.learn$table.alpha, 
-						table.num.dev = prob.learn$table.num, 
-						gstable.dev = colnames(prob.learn$cond.prob), 
+						table.dev = table.alpha, 
+						table.num.dev = table.num, 
+						gstable.dev = colnames(probbase.touse), 
 						nlevel.dev = 15
 						)
 	return(fit)  	

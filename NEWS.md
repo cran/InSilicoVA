@@ -1,5 +1,10 @@
 # InSilicoVA - changes
 
+Version 1.3.0 (2020-06-03) 
+==========================
++ New default option to specify impossible causes, "subset2", that deals with prematurity deaths.
++ Flexibility improvements in several functions.
+ 
 Version 1.2.9 (2020-05-07) 
 ==========================
 + fix bug with subpop specification in WHO2016 input

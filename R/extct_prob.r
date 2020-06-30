@@ -20,6 +20,7 @@
 #' input is coded numerically such that 1 for ``present'', 0 for ``absent'',
 #' and -1 for ``missing'', this indicator could be set to True to avoid
 #' conversion to standard InterVA format.
+#' @param impute  Indicator for whether to impute 1. P(S|C) with P(S) if symptom S does not exist more than the threshold of fractions within death due to C; and 2. values of exact 0 or 1. 
 #'
 #' @return 
 #'  \item{cond.prob}{raw P(S|C) matrix}
@@ -29,7 +30,7 @@
 #' 	\item{symps.train}{training data after removing symptoms with too high missing rate.}
 #' @export extract.prob
 #'
-extract.prob <- function(train, gs, gstable, thre = 0.95, type = c("quantile", "fixed", "empirical")[1], isNumeric = FALSE){
+extract.prob <- function(train, gs, gstable, thre = 0.95, type = c("quantile", "fixed", "empirical")[1], isNumeric = FALSE, impute=TRUE){
 
 	## help functions to count vector contents
 	if(isNumeric){
@@ -38,13 +39,13 @@ extract.prob <- function(train, gs, gstable, thre = 0.95, type = c("quantile", "
 		miss <- -1
 	}else{
 		yes <- "Y"
-		no <- ""
-		miss <- "."
+		no <- c("", "N")
+		miss <- c(".", "-")
 	}
 
-	countyes <- function(x){length(which(toupper(x) == yes))}
-	countno <- function(x){length(which(x == no))}
-	countmiss <- function(x){length(which(x == miss))}
+	countyes <- function(x){length(which(toupper(x) %in% yes))}
+	countno <- function(x){length(which(x %in% no))}
+	countmiss <- function(x){length(which(x %in% miss))}
 	countna <- function(x){length(which(is.na(x)))}
 	
 	##
@@ -131,7 +132,9 @@ extract.prob <- function(train, gs, gstable, thre = 0.95, type = c("quantile", "
 		}else{
 			# remove missing from calculation
 			count <- apply(cases, 2, countyes)
-			cond <- count / (length(list) - apply(cases, 2, countmiss))						
+			denom <- (length(list) - apply(cases, 2, countmiss))	
+			denom[denom < length(list)*thre] <- NA
+			cond <- count / denom					
 		}
 		cond.prob <- cbind(cond.prob, cond)
 	}
@@ -147,21 +150,23 @@ extract.prob <- function(train, gs, gstable, thre = 0.95, type = c("quantile", "
 	## but it's unreasonable to delete either, since they are useful
 	## for other causes and symptoms
 	bysymps <- apply(cond.prob, 1, countna)
-	if(length(which(bysymps > 0)) > 0){
-		message(paste("\n", length(which(bysymps > 0)), "missing symptom-cause combinations in training data, imputed using average symptom prevalence\n"))
-		## impute by Pr(s | c) by Prob(s | any c) 
-		##   i.e. relatively no info provided from this s-c combination
-		overall <- apply(train, 2, countyes) / dim(train)[1]
-		for(i in 1:S){
-			cond.prob[i, which(is.na(cond.prob[i,]))] <- overall[i]
-		}		
+	if(impute){
+		if(length(which(bysymps > 0)) > 0){
+			message(paste("\n", length(which(bysymps > 0)), "missing symptom-cause combinations in training data, imputed using average symptom prevalence\n"))
+			## impute by Pr(s | c) by Prob(s | any c) 
+			##   i.e. relatively no info provided from this s-c combination
+			overall <- apply(train, 2, countyes) / dim(train)[1]
+			for(i in 1:S){
+				cond.prob[i, which(is.na(cond.prob[i,]))] <- overall[i]
+			}		
+		}
 	}
 
 	## to avoid 0 and 1
 	zeroes <- which(cond.prob == 0)
 	ones <- which(cond.prob == 1)
-	cond.prob[zeroes] <- runif(length(zeroes), min = 1e-6, max = 2e-6)
-	cond.prob[ones] <- 1 - runif(length(ones), min = 1e-6, max = 2e-6)
+	if(impute) cond.prob[zeroes] <- runif(length(zeroes), min = 1e-6, max = 2e-6)
+	if(impute) cond.prob[ones] <- 1 - runif(length(ones), min = 1e-6, max = 2e-6)
 
 	conditionals <- as.vector(cond.prob)
 
@@ -208,7 +213,9 @@ extract.prob <- function(train, gs, gstable, thre = 0.95, type = c("quantile", "
 
 	
 	# the levels returned are from high to low
-	
+	if(sum(is.na(cond.prob)) > 0){
+		cond.prob.alpha[is.na(cond.prob)] <- NA
+	}
 	return(list(cond.prob = cond.prob,
 				cond.prob.alpha = cond.prob.alpha,
 				table.alpha = levels, 
