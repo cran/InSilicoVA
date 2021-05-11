@@ -20,10 +20,11 @@
 #' 
 #' Maintainer: Zehang Li <lizehang@uw.edu>
 #' @seealso \code{\link{insilico}}, \code{\link{updateIndiv}}, \code{\link{plot.insilico}}
-#' @references Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
-#' Crampin, Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death
-#' assignment using verbal autopsies, \emph{arXiv preprint arXiv:1411.3042}
-#' \url{http://arxiv.org/abs/1411.3042} (2014)
+#' @references 
+#' Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C. Crampin,
+#' Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death assignment
+#' using verbal autopsies, \emph{Journal of the American Statistical
+#' Association} (2016), 111(515):1036-1049.
 #' @examples
 #' \dontrun{
 #' data(RandomVA1)
@@ -90,7 +91,7 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 			datagroup.all$final.group <- datagroup.all[, -1]
 		}
 		# get the group name for subset in insilico fitted data
-		index.tmp <- match(rownames(object$data), datagroup.all[, 1])
+		index.tmp <- match(rownames(object$data.final), datagroup.all[, 1])
 		if(length(which(!is.na(index.tmp))) == 0){
 			stop("no matching ID found in the data")
 		}
@@ -131,7 +132,7 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 		csmf <- aperm(csmf, c(2, 3, 1))
 	}
 
-	data.j <- .jarray(object$data, dispatch = TRUE)
+	data.j <- .jarray(object$data.final, dispatch = TRUE)
 	subpop.j <- .jarray(subpop, dispatch = TRUE)
 	impossible.j <- .jarray(object$impossible.causes, dispatch = TRUE)
 	# get condprob to be Nitr * S * C array
@@ -220,7 +221,7 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 				          matrix(0, dim(indiv)[1], length(external.causes)), 
 				          indiv[, external.causes[1]:C0])
 			colnames(indiv) <- colnames(object$indiv.prob)
-			id.out <- c(id[match(rownames(object$data), id)], id[which(ext.flag > 0)])
+			id.out <- c(id[match(rownames(object$data.final), id)], id[which(ext.flag > 0)])
 		}else{
 			id.out <- id
 			ext.probs <- NULL
@@ -350,10 +351,10 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 #' 
 #' Maintainer: Zehang Li <lizehang@@uw.edu>
 #' @seealso \code{\link{insilico}}, \code{\link{get.indiv}}
-#' @references Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
-#' Crampin, Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death
-#' assignment using verbal autopsies, \emph{arXiv preprint arXiv:1411.3042}
-#' \url{http://arxiv.org/abs/1411.3042} (2014)
+#' @references #' Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C. Crampin,
+#' Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death assignment
+#' using verbal autopsies, \emph{Journal of the American Statistical
+#' Association} (2016), 111(515):1036-1049.
 #' @examples
 #' \dontrun{
 #' data(RandomVA1)

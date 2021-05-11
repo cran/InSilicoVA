@@ -1,5 +1,8 @@
 # InSilicoVA - changes
-
+Version 1.3.1 (2021-05-09) 
+==========================
++ Minor bug fixes.
+ 
 Version 1.3.0 (2020-06-03) 
 ==========================
 + New default option to specify impossible causes, "subset2", that deals with prematurity deaths.

@@ -8,7 +8,7 @@
 #' input format and training data. 
 #' 
 #' For more detail of model specification, see the paper on
-#' \url{http://arxiv.org/abs/1411.3042}.
+#' \url{https://arxiv.org/abs/1411.3042}.
 #' 
 #' @param data The original data to be used. It is suggested to use similar
 #' input as InterVA4, with the first column being death IDs and 245 symptoms. 

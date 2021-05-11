@@ -4,8 +4,16 @@
 \alias{physician_debias}
 \title{Implement physician debias algorithm}
 \usage{
-physician_debias(data, phy.id, phy.code, phylist, causelist, tol = 1e-04,
-  max.itr = 5000, verbose = FALSE)
+physician_debias(
+  data,
+  phy.id,
+  phy.code,
+  phylist,
+  causelist,
+  tol = 1e-04,
+  max.itr = 5000,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{data}{The original data to be used. It is suggested to use similar

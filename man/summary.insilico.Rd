@@ -4,8 +4,15 @@
 \alias{summary.insilico}
 \title{Summarizing InSilicoVA Model Fits}
 \usage{
-\method{summary}{insilico}(object, CI.csmf = 0.95, CI.cond = 0.95,
-  file = NULL, top = 10, id = NULL, ...)
+\method{summary}{insilico}(
+  object,
+  CI.csmf = 0.95,
+  CI.cond = 0.95,
+  file = NULL,
+  top = 10,
+  id = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{Fitted \code{"insilico"} object.}
@@ -73,10 +80,10 @@ summary(fit1, file = "results.csv")
 }
 }
 \references{
-Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
-Crampin, Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death
-assignment using verbal autopsies, \emph{arXiv preprint arXiv:1411.3042}
-\url{http://arxiv.org/abs/1411.3042} (2014)
+Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C. Crampin,
+Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death assignment
+using verbal autopsies, \emph{Journal of the American Statistical
+Association} (2016), 111(515):1036-1049.
 }
 \seealso{
 \code{\link{insilico}}, \code{\link{plot.insilico}}

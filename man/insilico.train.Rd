@@ -4,19 +4,46 @@
 \alias{insilico.train}
 \title{Modified InSilicoVA methods with training data}
 \usage{
-insilico.train(data, train, cause, causes.table = NULL, thre = 0.95,
-  type = c("quantile", "fixed", "empirical")[1], isNumeric = FALSE,
-  updateCondProb = TRUE, keepProbbase.level = TRUE, CondProb = NULL,
-  CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE,
-  warning.write = FALSE, external.sep = TRUE, Nsim = 4000,
-  thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02,
-  jump.scale = 0.1, levels.prior = NULL, levels.strength = NULL,
-  trunc.min = 1e-04, trunc.max = 0.9999, subpop = NULL,
-  java_option = "-Xmx1g", seed = 1, phy.code = NULL,
-  phy.cat = NULL, phy.unknown = NULL, phy.external = NULL,
-  phy.debias = NULL, exclude.impossible.cause = TRUE,
-  impossible.combination = NULL, indiv.CI = NULL,
-  CondProbTable = NULL, ...)
+insilico.train(
+  data,
+  train,
+  cause,
+  causes.table = NULL,
+  thre = 0.95,
+  type = c("quantile", "fixed", "empirical")[1],
+  isNumeric = FALSE,
+  updateCondProb = TRUE,
+  keepProbbase.level = TRUE,
+  CondProb = NULL,
+  CondProbNum = NULL,
+  datacheck = TRUE,
+  datacheck.missing = TRUE,
+  warning.write = FALSE,
+  external.sep = TRUE,
+  Nsim = 4000,
+  thin = 10,
+  burnin = 2000,
+  auto.length = TRUE,
+  conv.csmf = 0.02,
+  jump.scale = 0.1,
+  levels.prior = NULL,
+  levels.strength = NULL,
+  trunc.min = 1e-04,
+  trunc.max = 0.9999,
+  subpop = NULL,
+  java_option = "-Xmx1g",
+  seed = 1,
+  phy.code = NULL,
+  phy.cat = NULL,
+  phy.unknown = NULL,
+  phy.external = NULL,
+  phy.debias = NULL,
+  exclude.impossible.cause = TRUE,
+  impossible.combination = NULL,
+  indiv.CI = NULL,
+  CondProbTable = NULL,
+  ...
+)
 }
 \arguments{
 \item{data}{The original data to be used. It is suggested to use similar
@@ -128,8 +155,8 @@ This function implements InSilicoVA model with non-InterVA4 input data.
 \details{
 Please see \code{insilico} for more details about choosing chain length and 
 OS system differences. This function implements InSilico with customized
-input format and training data.
+input format and training data. 
 
 For more detail of model specification, see the paper on
-\url{http://arxiv.org/abs/1411.3042}.
+\url{https://arxiv.org/abs/1411.3042}.
 }

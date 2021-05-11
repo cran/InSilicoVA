@@ -4,8 +4,15 @@
 \alias{extract.prob}
 \title{Obtain conditional probabilities from training data}
 \usage{
-extract.prob(train, gs, gstable, thre = 0.95, type = c("quantile",
-  "fixed", "empirical")[1], isNumeric = FALSE, impute = TRUE)
+extract.prob(
+  train,
+  gs,
+  gstable,
+  thre = 0.95,
+  type = c("quantile", "fixed", "empirical")[1],
+  isNumeric = FALSE,
+  impute = TRUE
+)
 }
 \arguments{
 \item{train}{Training data, it should be in the same format as the testing data

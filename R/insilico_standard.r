@@ -12,7 +12,7 @@
 #' 
 #' This function implements InSilicoVA model. The InSilicoVA model is fitted
 #' with MCMC implemented in Java. For more detail, see the paper on
-#' \url{http://arxiv.org/abs/1411.3042}.
+#' \url{https://arxiv.org/abs/1411.3042}.
 #' 
 #' For Windows user, this function will produce a popup window showing the
 #' progress. For Mac and Unix user, this function will print progress messages
@@ -33,7 +33,7 @@
 #' chains will be thinned in the same way.
 #' 
 #' For more detail of model specification, see the paper on
-#' \url{http://arxiv.org/abs/1411.3042}.
+#' \url{https://arxiv.org/abs/1411.3042}.
 #' 
 #' @param data The original data to be used. It is suggested to use similar
 #' input as InterVA4, with the first column being death IDs and 245 symptoms. 
@@ -174,7 +174,7 @@
 #' @references Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
 #' Crampin, Kathleen Kahn and Samuel J. Clark(2014) \emph{Probabilistic
 #' cause-of-death assignment using verbal autopsies},
-#' \url{http://arxiv.org/abs/1411.3042} \cr \emph{Working paper no. 147, Center
+#' \url{https://arxiv.org/abs/1411.3042} \cr \emph{Working paper no. 147, Center
 #' for Statistics and the Social Sciences, University of Washington}
 #' @keywords InSilicoVA
 #' @import rJava

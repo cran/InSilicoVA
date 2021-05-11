@@ -4,12 +4,25 @@
 \alias{indivplot}
 \title{plot aggregated COD distribution}
 \usage{
-indivplot(x, type = c("errorbar", "bar")[1], top = 10,
-  causelist = NULL, which.plot = NULL, xlab = "Causes",
+indivplot(
+  x,
+  type = c("errorbar", "bar")[1],
+  top = 10,
+  causelist = NULL,
+  which.plot = NULL,
+  xlab = "Causes",
   ylab = "COD distribution",
-  title = "COD distributions for the top causes", horiz = TRUE,
-  angle = 60, fill = "lightblue", err_width = 0.4, err_size = 0.6,
-  point_size = 2, border = "black", bw = FALSE, ...)
+  title = "COD distributions for the top causes",
+  horiz = TRUE,
+  angle = 60,
+  fill = "lightblue",
+  err_width = 0.4,
+  err_size = 0.6,
+  point_size = 2,
+  border = "black",
+  bw = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{object from \code{get.indiv} function.}
@@ -112,10 +125,10 @@ indivplot(agg.by.sex.age, which.plot = list("Men 60-", "Women 60-"),
 } 
 }
 \references{
-Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
-Crampin, Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death
-assignment using verbal autopsies, \emph{arXiv preprint arXiv:1411.3042}
-\url{http://arxiv.org/abs/1411.3042} (2014)
+Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C. Crampin,
+Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death assignment
+using verbal autopsies, \emph{Journal of the American Statistical
+Association} (2016), 111(515):1036-1049.
 }
 \seealso{
 \code{\link{insilico}}, \code{\link{summary.insilico}}

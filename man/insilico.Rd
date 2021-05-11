@@ -4,19 +4,44 @@
 \alias{insilico}
 \title{Implement InSilicoVA methods}
 \usage{
-insilico(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL,
-  isNumeric = FALSE, updateCondProb = TRUE,
-  keepProbbase.level = TRUE, CondProb = NULL, CondProbNum = NULL,
-  datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE,
-  directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10,
-  burnin = 2000, auto.length = TRUE, conv.csmf = 0.02,
-  jump.scale = 0.1, levels.prior = NULL, levels.strength = 1,
-  trunc.min = 1e-04, trunc.max = 0.9999, subpop = NULL,
-  java_option = "-Xmx1g", seed = 1, phy.code = NULL,
-  phy.cat = NULL, phy.unknown = NULL, phy.external = NULL,
-  phy.debias = NULL, exclude.impossible.cause = c("subset2", "subset",
-  "all", "InterVA", "none")[1], no.is.missing = FALSE, indiv.CI = NULL,
-  groupcode = FALSE, ...)
+insilico(
+  data,
+  data.type = c("WHO2012", "WHO2016")[1],
+  sci = NULL,
+  isNumeric = FALSE,
+  updateCondProb = TRUE,
+  keepProbbase.level = TRUE,
+  CondProb = NULL,
+  CondProbNum = NULL,
+  datacheck = TRUE,
+  datacheck.missing = TRUE,
+  warning.write = FALSE,
+  directory = NULL,
+  external.sep = TRUE,
+  Nsim = 4000,
+  thin = 10,
+  burnin = 2000,
+  auto.length = TRUE,
+  conv.csmf = 0.02,
+  jump.scale = 0.1,
+  levels.prior = NULL,
+  levels.strength = 1,
+  trunc.min = 1e-04,
+  trunc.max = 0.9999,
+  subpop = NULL,
+  java_option = "-Xmx1g",
+  seed = 1,
+  phy.code = NULL,
+  phy.cat = NULL,
+  phy.unknown = NULL,
+  phy.external = NULL,
+  phy.debias = NULL,
+  exclude.impossible.cause = c("subset2", "subset", "all", "InterVA", "none")[1],
+  no.is.missing = FALSE,
+  indiv.CI = NULL,
+  groupcode = FALSE,
+  ...
+)
 }
 \arguments{
 \item{data}{The original data to be used. It is suggested to use similar
@@ -190,7 +215,7 @@ external causes separated calculated.}
 \description{
 This function implements InSilicoVA model. The InSilicoVA model is fitted
 with MCMC implemented in Java. For more detail, see the paper on
-\url{http://arxiv.org/abs/1411.3042}.
+\url{https://arxiv.org/abs/1411.3042}.
 }
 \details{
 For Windows user, this function will produce a popup window showing the
@@ -212,7 +237,7 @@ avoid heavy memory use. A warning will be given in that case. The extended
 chains will be thinned in the same way.
 
 For more detail of model specification, see the paper on
-\url{http://arxiv.org/abs/1411.3042}.
+\url{https://arxiv.org/abs/1411.3042}.
 }
 \examples{
 \dontrun{
@@ -379,7 +404,7 @@ fit1<- insilico(RandomVA1, subpop = NULL,
 Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
 Crampin, Kathleen Kahn and Samuel J. Clark(2014) \emph{Probabilistic
 cause-of-death assignment using verbal autopsies},
-\url{http://arxiv.org/abs/1411.3042} \cr \emph{Working paper no. 147, Center
+\url{https://arxiv.org/abs/1411.3042} \cr \emph{Working paper no. 147, Center
 for Statistics and the Social Sciences, University of Washington}
 }
 \seealso{

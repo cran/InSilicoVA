@@ -36,10 +36,10 @@ summary(fit1, file = "results.csv")
 }
 }
 \references{
-Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
-Crampin, Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death
-assignment using verbal autopsies, \emph{arXiv preprint arXiv:1411.3042}
-\url{http://arxiv.org/abs/1411.3042} (2014)
+Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C. Crampin,
+Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death assignment
+using verbal autopsies, \emph{Journal of the American Statistical
+Association} (2016), 111(515):1036-1049.
 }
 \seealso{
 \code{\link{summary.insilico}}

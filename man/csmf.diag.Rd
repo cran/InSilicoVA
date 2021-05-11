@@ -4,8 +4,15 @@
 \alias{csmf.diag}
 \title{Convergence test for fitted InSilico model}
 \usage{
-csmf.diag(csmf, conv.csmf = 0.02, test = c("gelman", "heidel")[2],
-  verbose = TRUE, autoburnin = FALSE, which.sub = NULL, ...)
+csmf.diag(
+  csmf,
+  conv.csmf = 0.02,
+  test = c("gelman", "heidel")[2],
+  verbose = TRUE,
+  autoburnin = FALSE,
+  which.sub = NULL,
+  ...
+)
 }
 \arguments{
 \item{csmf}{It could be either fitted \code{"insilico"} object, a list of
@@ -97,10 +104,10 @@ csmf.diag(list(fit2a, fit2b, fit2c), test = "gelman", which.sub = "Men")
 
 }
 \references{
-Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
-Crampin, Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death
-assignment using verbal autopsies, \emph{arXiv preprint arXiv:1411.3042}
-\url{http://arxiv.org/abs/1411.3042} (2014)
+Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C. Crampin,
+Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death assignment
+using verbal autopsies, \emph{Journal of the American Statistical
+Association} (2016), 111(515):1036-1049.
 
 Gelman, Andrew, and Donald B. Rubin. Inference from iterative simulation
 using multiple sequences. \emph{Statistical science} (1992): 457-472.

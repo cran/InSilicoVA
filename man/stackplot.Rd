@@ -4,12 +4,28 @@
 \alias{stackplot}
 \title{plot grouped CSMF from a "insilico" object}
 \usage{
-stackplot(x, grouping = NULL, type = c("stack", "dodge")[1],
-  order.group = NULL, order.sub = NULL, err = TRUE, CI = 0.95,
-  sample.size.print = FALSE, xlab = "Group", ylab = "CSMF",
-  ylim = NULL, title = "CSMF by broader cause categories",
-  horiz = FALSE, angle = 60, err_width = 0.4, err_size = 0.6,
-  point_size = 2, border = "black", bw = FALSE, ...)
+stackplot(
+  x,
+  grouping = NULL,
+  type = c("stack", "dodge")[1],
+  order.group = NULL,
+  order.sub = NULL,
+  err = TRUE,
+  CI = 0.95,
+  sample.size.print = FALSE,
+  xlab = "Group",
+  ylab = "CSMF",
+  ylim = NULL,
+  title = "CSMF by broader cause categories",
+  horiz = FALSE,
+  angle = 60,
+  err_width = 0.4,
+  err_size = 0.6,
+  point_size = 2,
+  border = "black",
+  bw = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{fitted \code{"insilico"} object}
@@ -101,10 +117,10 @@ Produce bar plot of the CSMFs for a fitted \code{"insilico"} object in broader g
 } 
 }
 \references{
-Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
-Crampin, Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death
-assignment using verbal autopsies, \emph{arXiv preprint arXiv:1411.3042}
-\url{http://arxiv.org/abs/1411.3042} (2014)
+Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C. Crampin,
+Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death assignment
+using verbal autopsies, \emph{Journal of the American Statistical
+Association} (2016), 111(515):1036-1049.
 }
 \seealso{
 \code{\link{insilico}}, \code{\link{summary.insilico}}

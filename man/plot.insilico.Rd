@@ -4,11 +4,25 @@
 \alias{plot.insilico}
 \title{plot CSMF from a "insilico" object}
 \usage{
-\method{plot}{insilico}(x, type = c("errorbar", "bar", "compare")[1],
-  top = 10, causelist = NULL, which.sub = NULL, xlab = "Causes",
-  ylab = "CSMF", title = "Top CSMF Distribution", horiz = TRUE,
-  angle = 60, fill = "lightblue", err_width = 0.4, err_size = 0.6,
-  point_size = 2, border = "black", bw = FALSE, ...)
+\method{plot}{insilico}(
+  x,
+  type = c("errorbar", "bar", "compare")[1],
+  top = 10,
+  causelist = NULL,
+  which.sub = NULL,
+  xlab = "Causes",
+  ylab = "CSMF",
+  title = "Top CSMF Distribution",
+  horiz = TRUE,
+  angle = 60,
+  fill = "lightblue",
+  err_width = 0.4,
+  err_size = 0.6,
+  point_size = 2,
+  border = "black",
+  bw = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{fitted \code{"insilico"} object}
@@ -111,10 +125,10 @@ plot(fit2, type = "compare", horiz = FALSE,  causelist = some_causes_1,
 
 }
 \references{
-Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C.
-Crampin, Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death
-assignment using verbal autopsies, \emph{arXiv preprint arXiv:1411.3042}
-\url{http://arxiv.org/abs/1411.3042} (2014)
+Tyler H. McCormick, Zehang R. Li, Clara Calvert, Amelia C. Crampin,
+Kathleen Kahn and Samuel J. Clark Probabilistic cause-of-death assignment
+using verbal autopsies, \emph{Journal of the American Statistical
+Association} (2016), 111(515):1036-1049.
 }
 \seealso{
 \code{\link{insilico}}, \code{\link{summary.insilico}}
