@@ -1,4 +1,8 @@
 # InSilicoVA - changes
+Version 1.3.2 (2021-05-25) 
+==========================
++ Minor fixes to pass Debian _R_CHECK_MATRIX_DATA.
+ 
 Version 1.3.1 (2021-05-09) 
 ==========================
 + Minor bug fixes.

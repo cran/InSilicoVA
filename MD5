@@ -1,8 +1,8 @@
-5ab8dc263684b52959f63df59de9ea62 *DESCRIPTION
+b454d8a48bcd03f71b5c655075c4b9cd *DESCRIPTION
 75478f5a3ad0c5fac6e6d76333d0a101 *NAMESPACE
-78e1b50ce1a6984bbdcda7939966aea2 *NEWS.md
+e89a8f43ad308c92f9af9c5c00fa100c *NEWS.md
 eb9c7f77a56bb5bf2e41633c0bc99693 *R/diag.r
-cbbc322d30d15fac5598d16549ec1a59 *R/extct_prob.r
+a2d189eb61b3bb9217cc93a52df77e8b *R/extct_prob.r
 ac17183e4ff984bd0be389a9abe62d4d *R/get_indiv.r
 408b787e0b41c54a711128d743801551 *R/groupplot.r
 cd2cfe57b147c1887f41e454e2dfd14a *R/indivplot.r

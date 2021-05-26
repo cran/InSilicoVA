@@ -58,7 +58,7 @@ extract.prob <- function(train, gs, gstable, thre = 0.95, type = c("quantile", "
 	##              (e.g. .1, .2, .3, .7, 1) -> E=(0, 0.1), D=(.1, .2), ..
 	toLevel <- function(cond.prob, levels, cutoffs){
 		cond.prob.vec <- as.vector(cond.prob)
-		new <- rep(no , length(cond.prob.vec))
+		new <- rep(NA, length(cond.prob.vec))
 		cdf <- ecdf(cond.prob.vec)
 		table <- table.median <- rep(0, length(cutoffs))
 		for(i in length(cutoffs) : 1){
