@@ -1,4 +1,8 @@
 # InSilicoVA - changes
+Version 1.3.3 (2021-07-01) 
+==========================
++ The default `subset2` option for removing impossible causes now include rules to avoid assigning pregnancy-related causes to deaths with i310o = Y (i.e., not pregnant).
+
 Version 1.3.2 (2021-05-25) 
 ==========================
 + Minor fixes to pass Debian _R_CHECK_MATRIX_DATA.

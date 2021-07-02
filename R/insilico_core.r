@@ -1182,6 +1182,27 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 				}
 			}
 		}
+
+		# Add pregnancy death fix
+		if(exclude.impossible.cause  == "subset2"){
+				add.impossible <- matrix(NA,9,3)
+				add.impossible[, 1] <- "i310o"
+				add.impossible[, 3] <- "1"
+				add.impossible[1, 2] <- "b_0901"
+				add.impossible[2, 2] <- "b_0902"
+				add.impossible[3, 2] <- "b_0903"
+				add.impossible[4, 2] <- "b_0904"
+				add.impossible[5, 2] <- "b_0905"
+				add.impossible[6, 2] <- "b_0906"
+				add.impossible[7, 2] <- "b_0907"
+				add.impossible[8, 2] <- "b_0908"
+				add.impossible[9, 2] <- "b_0999"
+				if(is.null(impossible.combination)){
+					impossible.combination <- add.impossible
+				}else{
+					impossible.combination <- rbind(impossible.combination, add.impossible)
+				}
+		}
 		
 		# Add prematurity fix
 		if(exclude.impossible.cause  == "subset2"){
@@ -1190,7 +1211,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 				ss <- match(s.set, colnames(data)[-1])
 				val.onlyprem <- as.integer(0)
 				val.notprem <- as.integer(1)
-	  		}else{
+	  	}else{
 	  			s.set <- "i367a"
 				ss <- match(s.set, colnames(data)[-1])
 				# if negated, then reverse 
@@ -1205,10 +1226,21 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 
 		impossible <- as.matrix(impossible)	
 
-	}else if(!is.null(impossible.combination) && exclude.impossible.cause){
+		if(!is.null(impossible.combination)){
+			for(ii in 1:dim(impossible.combination)[1]){
+					ss <- match(impossible.combination[ii, 1], colnames(data)[-1])
+					cc <- match(impossible.combination[ii, 2], colnames(prob.orig))
+					val <- 1 - as.numeric(impossible.combination[ii, 3])
+					if((!is.na(ss)) && (!is.na(cc))){
+							impossible <- rbind(impossible, c(as.integer(cc), as.integer(ss), as.integer(val)))
+					}
+			}
+		}
+
+	}else if(!is.null(impossible.combination)){
 		impossible <- NULL
-		for(ii in 1:dim(impossible.combination)){
-			ss <- match(impossible.combination[ii, 1], rownames(prob.orig))
+		for(ii in 1:dim(impossible.combination)[1]){
+			ss <- match(impossible.combination[ii, 1], colnames(data)[-1])
 			cc <- match(impossible.combination[ii, 2], colnames(prob.orig))
 			if((!is.na(ss)) && (!is.na(cc))){
 					impossible <- rbind(impossible, c(as.integer(cc), as.integer(ss)))

@@ -1,13 +1,13 @@
-b454d8a48bcd03f71b5c655075c4b9cd *DESCRIPTION
+54deaf5e8e59c89da5b3491776781a8e *DESCRIPTION
 75478f5a3ad0c5fac6e6d76333d0a101 *NAMESPACE
-e89a8f43ad308c92f9af9c5c00fa100c *NEWS.md
+ff5e81e68844f8d0cc0a59f0d8c57ee4 *NEWS.md
 eb9c7f77a56bb5bf2e41633c0bc99693 *R/diag.r
 a2d189eb61b3bb9217cc93a52df77e8b *R/extct_prob.r
 ac17183e4ff984bd0be389a9abe62d4d *R/get_indiv.r
 408b787e0b41c54a711128d743801551 *R/groupplot.r
 cd2cfe57b147c1887f41e454e2dfd14a *R/indivplot.r
-e0e5f1108eb92d755e5d99db009666d5 *R/insilico_core.r
-fb8620ad7b71ea4c51668e4ac939873c *R/insilico_standard.r
+12ed77c5f6a8bbd32fe2ede7dff714a4 *R/insilico_core.r
+770d060f956410ce52ec6172e334b865 *R/insilico_standard.r
 9c15cda33231141892936d2324c5575e *R/insilico_train.r
 b7b962792af46d3d3347a8aa56a6c14f *R/onLoad.r
 d1d5aa59f4ed4766191da778bf46e3a2 *R/phy_debias.r
@@ -43,7 +43,7 @@ c88cb95d2aa481792d018431d04717d0 *man/condprob.Rd
 be77c3dabe8f239c19364eef321ce2f6 *man/extract.prob.Rd
 90d90f498a63532caf6495ecf9012b00 *man/get.indiv.Rd
 3cf342cec06b6a431f69b4a2e5ecda13 *man/indivplot.Rd
-8665f01fc444d0a3c24afa5fa26ec4f7 *man/insilico.Rd
+e1e916a38996cb58046f03c60dadf8af *man/insilico.Rd
 edfeee85e46188ba6f375adee34c16b2 *man/insilico.fit.Rd
 536131b972e5812b7068287f924deef9 *man/insilico.train.Rd
 6eadd3a5a011fa10d3a037716e4ada93 *man/java_message.Rd
