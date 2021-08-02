@@ -1,4 +1,8 @@
 # InSilicoVA - changes
+Version 1.3.4 (2021-08-01) 
+==========================
++ Bug fix in missing data threshold for customized (non-WHO) input format.
+
 Version 1.3.3 (2021-07-01) 
 ==========================
 + The default `subset2` option for removing impossible causes now include rules to avoid assigning pregnancy-related causes to deaths with i310o = Y (i.e., not pregnant).

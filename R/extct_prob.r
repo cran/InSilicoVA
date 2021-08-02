@@ -133,7 +133,7 @@ extract.prob <- function(train, gs, gstable, thre = 0.95, type = c("quantile", "
 			# remove missing from calculation
 			count <- apply(cases, 2, countyes)
 			denom <- (length(list) - apply(cases, 2, countmiss))	
-			denom[denom < length(list)*thre] <- NA
+			denom[denom < length(list)*(1-thre)] <- NA
 			cond <- count / denom					
 		}
 		cond.prob <- cbind(cond.prob, cond)

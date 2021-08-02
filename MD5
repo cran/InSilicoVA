@@ -1,8 +1,8 @@
-54deaf5e8e59c89da5b3491776781a8e *DESCRIPTION
+e536239dc88af82c4c35ceda1dc38d7f *DESCRIPTION
 75478f5a3ad0c5fac6e6d76333d0a101 *NAMESPACE
-ff5e81e68844f8d0cc0a59f0d8c57ee4 *NEWS.md
+87247e006effe6874fec6ce873b11da0 *NEWS.md
 eb9c7f77a56bb5bf2e41633c0bc99693 *R/diag.r
-a2d189eb61b3bb9217cc93a52df77e8b *R/extct_prob.r
+ef6d83b352d61a4d9be6f93bb35a6172 *R/extct_prob.r
 ac17183e4ff984bd0be389a9abe62d4d *R/get_indiv.r
 408b787e0b41c54a711128d743801551 *R/groupplot.r
 cd2cfe57b147c1887f41e454e2dfd14a *R/indivplot.r
@@ -56,10 +56,3 @@ dfef38da1702968eb2339b33395e3258 *man/probbase.Rd
 b03f8330b78b38bf53bb68aaa2736f49 *man/stackplot.Rd
 adb9a3187c09ab624e250783200c8136 *man/summary.insilico.Rd
 8e17010cc220e1f9f98bcdc0f798025c *man/updateIndiv.Rd
-788a69f4e8f680c645d83192836d56de *tests/testthat.R
-5be80ca3e7e7dfee0ce8736bc75883aa *tests/testthat/insilico_WHO2016.R
-0f46d048b540c65628385736079dc0e7 *tests/testthat/insilico_WHO2016.RData
-94f0079491a76b09ea950e0f046fd61b *tests/testthat/insilico_regression.R
-592b6084bbff71de3cc006111e4e05f3 *tests/testthat/insilico_regression.RData
-29a71885267978e779a28b15c9ab0b56 *tests/testthat/test-insilico_WHO2016.R
-0f790b7956f1dc36be883ae177fa6da7 *tests/testthat/test-insilico_regression.R
