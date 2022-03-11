@@ -1,4 +1,9 @@
 # InSilicoVA - changes
+Version 1.3.5 (2022-01-10) 
+==========================
++ `get.indiv` now can return posterior draws of P(cause | symptoms) for each individual.
++ New function `mapICD` to map ICD-10 codes to WHO 2016 cause list.
+
 Version 1.3.4 (2021-08-01) 
 ==========================
 + Bug fix in missing data threshold for customized (non-WHO) input format.

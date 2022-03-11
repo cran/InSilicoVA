@@ -389,17 +389,15 @@ plot(fit1)
 # example to change directory for error files
 fit1b <- insilico(RandomVA5[1:50, ], data.type="WHO2016", 
 					Nsim = 1000, burnin = 500, thin = 10 , 
-					seed = 1, warning.write = T, auto.length=F)
+					seed = 1, auto.length=F)
 fit1c <- insilico(RandomVA5[1:50, ], data.type="WHO2016", 
 					Nsim = 1000, burnin = 500, thin = 10 , 
-					seed = 1, warning.write = T, 
-					directory = "fit1b_errorfolder", auto.length=F)
+					seed = 1, auto.length=F)
 
  # similarly for WHO 2012 version
 fit1<- insilico(RandomVA1, subpop = NULL,  
               Nsim = 1000, burnin = 500, thin = 10 , seed = 1,
-		         auto.length = FALSE, 
-				 warning.write = T, directory = "fit1_errorfolder")
+		         auto.length = FALSE)
 
 }
 }

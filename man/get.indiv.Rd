@@ -10,6 +10,7 @@ get.indiv(
   CI = 0.95,
   is.aggregate = FALSE,
   by = NULL,
+  is.sample = FALSE,
   java_option = "-Xmx1g",
   ...
 )
@@ -24,6 +25,8 @@ get.indiv(
 \item{is.aggregate}{logical indicator for constructing aggregated distribution rather than individual distributions.}
 
 \item{by}{list of column names to group by.}
+
+\item{is.sample}{logical indicator for returning the posterior samples of individual probabilities instead of posterior summaries.}
 
 \item{java_option}{Option to initialize java JVM. Default to ``-Xmx1g'', which sets the maximum heap size to be 1GB.}
 
@@ -54,6 +57,10 @@ head(agg.csmf)
 agg.by.sex.age <- get.indiv(data = RandomVA1, fit1, CI = 0.95, 
                             is.aggregate = TRUE, by = list("sex", "age"))
 head(agg.by.sex.age$mean) 
+
+# Obtain individual level P(Y|X) posterior draws (N by C by Nitr array)
+prob <- get.indiv(data = RandomVA1, fit1, is.sample = TRUE)
+dim(prob)
 }
 }
 \references{

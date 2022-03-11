@@ -1310,4 +1310,77 @@ public class InsilicoSampler2 {
         return(out);
     }
 
+    public static double[][][] IndivProbSample(double[][] data, int[][] impossible, double[]csmf0, int[] subpop,
+                                               double[] condprob0, double p0, double p1,
+                                               int Nsub, int Nitr, int C, int S) {
+        int N = data.length;
+
+        /**   --------------- to bypass bug in rJava package  ----------------------- **/
+        // reconstruct csmf and condprob csmf[i, j, k] <-> csmf0[k*d1*d2 + j*d1 + i]
+        double[][][] csmf = new double[Nsub][Nitr][C];
+        double[][][] condprob = new double[Nitr][S][C];
+        for(int i = 0; i < Nsub; i++){
+            for(int j = 0; j < Nitr; j++){
+                for(int k = 0; k < C; k++){
+                    csmf[i][j][k] = csmf0[k * Nsub * Nitr + j * Nsub + i];
+                }
+            }
+        }
+        for(int i = 0; i < Nitr; i++){
+            for(int j = 0; j < S; j++){
+                for(int k = 0; k < C; k++){
+                    condprob[i][j][k] = condprob0[k * Nitr * S + j * Nitr + i];
+                }
+            }
+        }
+        /**   --------------- reconstruction done ----------------------- **/
+
+        int[][] zero_matrix = new int[N][C];
+        for(int i = 0; i < N; i++){
+            for(int j = 0; j < C; j++){
+                zero_matrix[i][j] = 1;
+            }
+        }
+        if(impossible[0].length == 2){
+            for(int i = 0; i < N; i++){
+                for(int k = 0; k < impossible.length; k++){
+                    if(data[i][impossible[k][1] - 1] == 1){
+                        zero_matrix[i][impossible[k][0] - 1] = 0;
+                    }
+                }
+            }
+        }
+        double[][][] allp = new double [N][C][Nitr];
+
+        for(int i = 0; i < N; i++){
+            // get subpop index for death i
+            int sub = subpop[i] - 1;
+            for(int t = 0; t < Nitr; t++) {
+
+                /** ------------------------------------------------**/
+                double sum = 0;
+                for (int c = 0; c < C; c++) {
+                    allp[i][c][t] = csmf[sub][t][c] * zero_matrix[i][c];
+                    for (int s = 0; s < S; s++) {
+                        if(condprob[t][s][c] == 0){System.out.print(".");}
+
+                        if (data[i][s] == 1) {
+                            allp[i][c][t] *= condprob[t][s][c];
+                        } else if (data[i][s] == 0) {
+                            allp[i][c][t] *= 1 - condprob[t][s][c];
+                        }
+                    }
+                    sum += allp[i][c][t];
+                }
+                for (int c = 0; c < C; c++) {
+                    allp[i][c][t] = (sum == 0) ? allp[i][c][t] : allp[i][c][t] / sum;
+                }
+                /** ------------------------------------------------**/
+            }
+        }
+
+        return(allp);
+    }
+
 }
+

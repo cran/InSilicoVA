@@ -8,6 +8,7 @@
 #' @param CI Credible interval for posterior estimates.
 #' @param is.aggregate logical indicator for constructing aggregated distribution rather than individual distributions.
 #' @param by list of column names to group by.
+#' @param is.sample logical indicator for returning the posterior samples of individual probabilities instead of posterior summaries.
 #' @param java_option Option to initialize java JVM. Default to ``-Xmx1g'', which sets the maximum heap size to be 1GB.
 #' @param \dots Not used.
 #' @return
@@ -41,9 +42,13 @@
 #' agg.by.sex.age <- get.indiv(data = RandomVA1, fit1, CI = 0.95, 
 #'                             is.aggregate = TRUE, by = list("sex", "age"))
 #' head(agg.by.sex.age$mean) 
+#' 
+#' # Obtain individual level P(Y|X) posterior draws (N by C by Nitr array)
+#' prob <- get.indiv(data = RandomVA1, fit1, is.sample = TRUE)
+#' dim(prob)
 #' }
 #' @export get.indiv
-get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by = NULL, java_option = "-Xmx1g", ...){
+get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by = NULL, is.sample = FALSE, java_option = "-Xmx1g", ...){
 	if(is.null(java_option)) java_option = "-Xmx1g"
 	options( java.parameters = java_option )
 	id <- object$id
@@ -176,7 +181,68 @@ get.indiv <- function(object, data = NULL, CI = 0.95, is.aggregate = FALSE, by =
 	condprob.j <- .jarray(condprob, dispatch = TRUE)
 	csmf.j <- .jarray(csmf, dispatch = TRUE)
 	#-------------------------------------------------------------------#
-	if(!is.aggregate){
+	if(is.sample){
+		message("Calculating individual COD posterior draws\n")
+		# return a list with length N, each with dimensional C by Nitr
+		indiv <- try( 
+			 .jcall(obj, "[[[D", "IndivProbSample", 
+					 data.j, impossible.j, csmf.j, subpop.j, condprob.j, 
+					 (1 - CI)/2, 1-(1-CI)/2, 
+					 Nsub, Nitr, C, S)
+			 , FALSE)
+		if(is(indiv, "try-error")){
+			java_message()	
+			stop()
+		}
+		indivprob <- array(NA, c(length(indiv), C, Nitr))
+		for(i in 1:length(indiv)){
+			indivprob[i, , ] <- do.call(rbind, lapply(indiv[[i]], .jevalArray))		
+		}
+
+		# if not customized probbase, use longer cause names for output
+		if(!object$is.customized){
+			if(object$data.type == "WHO2012"){
+				data("causetext", envir = environment())
+				causetext<- get("causetext", envir  = environment())
+			}else{
+				data("causetextV5", envir = environment())
+				causetext<- get("causetextV5", envir  = environment())
+			}			
+			match.cause <- pmatch(causetext[, 1],  colnames(object$probbase))
+			index.cause <- order(match.cause)[1:sum(!is.na(match.cause))]
+			dimnames(indivprob)[[2]] <- causetext[index.cause, 2]
+		}else{
+			dimnames(indivprob)[[2]] <- colnames(object$probbase)
+		}
+		
+		## add back all external cause death 41:51 in standard VA
+		if(object$external){
+			external.causes <- object$external.causes
+			C0 <- dim(indivprob)[2]
+			ext.flag <- apply(object$indiv.prob[, external.causes], 1, sum)
+			ext.probs <- object$indiv.prob[which(ext.flag > 0), , drop = FALSE]
+
+			indivprob.ext <- array(0, dim = c(dim(indivprob)[1] + sum(ext.flag > 0), dim(indivprob)[2] + length(external.causes), dim(indivprob)[3]))
+			for(t in 1:Nitr){
+				indivprob.ext[1:dim(indivprob)[1], , t] <- cbind(
+										  indivprob[, 1:(external.causes[1] - 1), t], 
+										  matrix(0, dim(indivprob)[1], length(external.causes)), 
+										  indivprob[, external.causes[1]:C0, t]
+										)
+				indivprob.ext[(dim(indivprob)[1] + 1):dim(indivprob.ext)[1], , t] <- ext.probs
+			}
+			dimnames(indivprob.ext)[[2]] <- colnames(object$indiv.prob)
+			dimnames(indivprob.ext)[[1]]  <- c(id[match(rownames(object$data.final), id)], id[which(ext.flag > 0)])
+		}else{
+			indivprob.ext <- indivprob
+			dimnames(indivprob.ext)[[2]] <- colnames(object$indiv.prob)
+			dimnames(indivprob.ext)[[1]]  <- rownames(object$data.final)
+		}
+		dimnames(indivprob.ext)[[3]] <- paste0("sample", 1:Nitr)
+
+		return(indivprob.ext)
+
+	}else if(!is.aggregate & !is.sample){
 		message("Calculating individual COD distributions...\n")
 		# return rbind(mean, median, low, up), (4N) * C matrix
 		indiv <- try( 
