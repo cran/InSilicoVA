@@ -1362,6 +1362,8 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 	if(is.null(levels.prior)){
 			levels.prior <- scale.vec.inter(seq(1,nlevel), 
 					scale.max = prior.b.cond * 0.99)		
+	}else{
+			levels.prior <- levels.prior * (prior.b.cond * 0.99) / max(levels.prior)
 	}
 	##---------------------------------------------------------------##
 	## get sub-population information

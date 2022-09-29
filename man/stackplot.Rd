@@ -75,7 +75,7 @@ and white.}
 Produce bar plot of the CSMFs for a fitted \code{"insilico"} object in broader groups.
 }
 \examples{
-\donttest{
+\dontrun{
   data(RandomVA1) 
   ##
   ## Scenario 1: without sub-population specification

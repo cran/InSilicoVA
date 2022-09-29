@@ -37,7 +37,7 @@
 #' Association} (2016), 111(515):1036-1049.
 #' @keywords InSilicoVA
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'   data(RandomVA1) 
 #'   ##
 #'   ## Scenario 1: without sub-population specification
@@ -216,7 +216,16 @@ stackplot <- function(x, grouping = NULL,
 	}
 	g <- g + ggtitle(title)
 	if(horiz) g <- g + coord_flip()
-	if(bw) g <- g + theme_bw()
+	if(bw){
+		g <- g + theme_bw() + scale_fill_grey(start = 0, end = 0.9)
+	}else{
+		cbp <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+    maxn <- length(unique(toplot$Causes))
+    if(maxn > length(cbp)){
+      cbp <- colorRampPalette(cbp)(maxn)
+    }
+    g <- g + scale_fill_manual(values = cbp)
+	}
 	hjust <- NULL
 	if(angle != 0) hjust = 1
 	if(!horiz) g <- g + theme(axis.text.x = element_text(angle = angle, hjust = hjust))	

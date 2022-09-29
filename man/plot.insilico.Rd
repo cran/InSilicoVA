@@ -20,7 +20,7 @@
   err_size = 0.6,
   point_size = 2,
   border = "black",
-  bw = FALSE,
+  bw = TRUE,
   ...
 )
 }

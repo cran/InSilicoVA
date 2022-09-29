@@ -183,7 +183,16 @@ indivplot <- function(x, type = c("errorbar", "bar")[1],
 		g <- g + ggtitle(title)
 		g <- g + scale_y_continuous() 
 		if(horiz) g <- g + coord_flip()
-		if(bw) g <- g + theme_bw()
+		if(bw){
+			g <- g + theme_bw()
+		}else{
+			cbp <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+		    maxn <- length(unique(csmf.toplot$Group))
+		    if(maxn > length(cbp)){
+		      cbp <- colorRampPalette(cbp)(maxn)
+		    }
+		    g <- g + scale_color_manual(values = cbp)
+		}
 		if(!horiz) g <- g + theme(axis.text.x = element_text(angle = angle, hjust = 1))
 		return(g)
 	}else{		
@@ -206,7 +215,16 @@ indivplot <- function(x, type = c("errorbar", "bar")[1],
 			g <- g + xlab(xlab) + ylab(ylab) 
 			g <- g + ggtitle(title)
 			if(horiz) g <- g + coord_flip()
-			if(bw) g <- g + theme_bw()
+			if(bw){
+				g <- g + theme_bw()
+			}else{
+				cbp <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+			    maxn <- length(unique(csmf.toplot$Group))
+			    if(maxn > length(cbp)){
+			      cbp <- colorRampPalette(cbp)(maxn)
+			    }
+			    g <- g + scale_fill_manual(values = cbp)
+			}
 			if(!horiz) g <- g + theme(axis.text.x = element_text(angle = angle, hjust = 1))	
 			return(g)
 		}

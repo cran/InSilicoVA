@@ -61,7 +61,7 @@ not be comparable by this test.
 
 # load sample data together with sub-population list
 data(RandomVA2)
-\donttest{
+\dontrun{
 # extract InterVA style input data
 data <- RandomVA2
 # extract sub-population information. 

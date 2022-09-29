@@ -153,8 +153,8 @@ mapICD <- function(x){
             numCode <- as.numeric(numCode)
             if (start <= numCode & numCode <= stop) {
                 if(icd10Map[i, 1] == "Tetanus (neonatorum)") icd10Map[i, 1] = "Tetanus"
-                if(icd10Map[i, 1] == "Reproductive neoplasms (female)") icd10Map[i, 1] = "Respiratory neoplasms"
-                if(icd10Map[i, 1] == "Reproductive neoplasms (male)") icd10Map[i, 1] = "Respiratory neoplasms"
+                if(icd10Map[i, 1] == "Reproductive neoplasms (female)") icd10Map[i, 1] = "Reproductive neoplasms MF"
+                if(icd10Map[i, 1] == "Reproductive neoplasms (male)") icd10Map[i, 1] = "Reproductive neoplasms MF"
                 tmp <- icd10Map[i, 1]
                 break
             }

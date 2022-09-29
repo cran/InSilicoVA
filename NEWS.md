@@ -1,4 +1,9 @@
 # InSilicoVA - changes
+Version 1.3.6 (2022-09-25) 
+==========================
++ Bug fix in `mapICD`.
++ New color palette that is colorblind friendly.
+
 Version 1.3.5 (2022-01-10) 
 ==========================
 + `get.indiv` now can return posterior draws of P(cause | symptoms) for each individual.

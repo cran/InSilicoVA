@@ -47,6 +47,7 @@
 #' using verbal autopsies, \emph{Journal of the American Statistical
 #' Association} (2016), 111(515):1036-1049.
 #' @keywords InSilicoVA
+#' @importFrom grDevices colorRampPalette
 #' @examples
 #' 
 #' \dontrun{
@@ -95,7 +96,7 @@ plot.insilico <- function(x, type = c("errorbar", "bar", "compare")[1],
 	xlab = "Causes", ylab = "CSMF", title = "Top CSMF Distribution", 
 	horiz = TRUE, angle = 60, fill = "lightblue", 
 	err_width = .4, err_size = .6, point_size = 2, 
-	border = "black", bw = FALSE, ...){
+	border = "black", bw = TRUE, ...){
 	
 	sx <- summary(x)
 	# sx2 <- summary(x,  CI.csmf = 0.5)
@@ -275,7 +276,16 @@ plot.insilico <- function(x, type = c("errorbar", "bar", "compare")[1],
 		g <- g + ggtitle(title)
 		g <- g + scale_y_continuous() 
 		if(horiz) g <- g + coord_flip()
-		if(bw) g <- g + theme_bw()
+		if(bw){
+			g <- g + theme_bw()
+		} 
+		cbp <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+	    maxn <- length(unique(csmf.toplot$Group))
+	    if(maxn > length(cbp)){
+	      cbp <- colorRampPalette(cbp)(maxn)
+	    }
+	    g <- g + scale_color_manual(values = cbp)
+	
 		if(!horiz) g <- g + theme(axis.text.x = element_text(angle = angle, hjust = 1))
 		return(g)
 	}   
