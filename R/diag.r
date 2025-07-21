@@ -12,7 +12,7 @@
 #' 
 #' Produce convergence test for CSMFs from fitted \code{"insilico"} objects.
 #' 
-#' The tests are performed using \link{heidel.diag} and \link{gelman.diag}
+#' The tests are performed using \link[coda]{heidel.diag} and \link[coda]{gelman.diag}
 #' functions in \code{coda} package. The function takes either one or a list of
 #' output from \code{insilico} function, or only the iteration by CSMF matrix.
 #' Usually in practice, many causes with very tiny CSMF are hard to converge
@@ -41,8 +41,8 @@
 #' chain as burn in. Default to be FALSE since \code{insilico} return only the
 #' iterations after burnin by default.
 #' @param which.sub the name of the sub-population to test when there are multiple in the fitted object.
-#' @param \dots Arguments to be passed to \link{heidel.diag} or
-#' \link{gelman.diag}
+#' @param \dots Arguments to be passed to \link[coda]{heidel.diag} or
+#' \link[coda]{gelman.diag}
 #' @author Zehang Li, Tyler McCormick, Sam Clark
 #' 
 #' Maintainer: Zehang Li <lizehang@@uw.edu>

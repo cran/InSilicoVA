@@ -138,6 +138,7 @@
 #' @param no.is.missing logical indicator to treat all absence of symptoms as missing. Default to FALSE. If set to TRUE, InSilicoVA will perform calculations similar to InterVA-4 w.r.t treating absent symptoms. It is highly recommended to set this argument to FALSE.
 #' @param indiv.CI credible interval for individual probabilities. If set to NULL, individual COD distributions will not be calculated to accelerate model fitting time. See \code{\link{get.indiv}} for details of updating the C.I. later after fitting the model.
 #' @param groupcode logical indicator of including the group code in the output causes
+#' @param known_labels a data frame with two columns: the first column is the death ID and the second column is the known cause of death (need to match the cause list for the given data format). When it is provided for some causes, they will be used as partial labels in the input data. Any unmatched observations (unmatched by either ID or cause) will not contribute to partial labels. Default to be NULL
 #' @param ... not used
 #' 
 #' @return \item{id}{A vector of death ID. Note the order of the ID is in
@@ -348,7 +349,7 @@
 #' 
 #' }
 #' @export insilico
-insilico <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL, isNumeric = FALSE, 
+insilico <- function(data, data.type = c("WHO2012", "WHO2016")[2], sci = NULL, isNumeric = FALSE, 
   updateCondProb = TRUE, keepProbbase.level = TRUE,
   CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, 
   warning.write = FALSE, directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, 
@@ -357,7 +358,7 @@ insilico <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL, i
   subpop = NULL, java_option = "-Xmx1g", seed = 1, 
   phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, 
   phy.debias = NULL, exclude.impossible.cause = c("subset2", "subset", "all", "InterVA", "none")[1], impossible.combination = NULL,
-  no.is.missing = FALSE, indiv.CI = NULL, groupcode=FALSE, ...){ 
+  no.is.missing = FALSE, indiv.CI = NULL, groupcode=FALSE, known_labels = NULL, ...){ 
 	
 	# handling changes throughout time
 	  args <- as.list(match.call())
@@ -405,6 +406,7 @@ insilico <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL, i
 						impossible.combination = impossible.combination,
 						no.is.missing = no.is.missing,
 						indiv.CI = indiv.CI, 
-						groupcode=groupcode)
+						groupcode=groupcode, 
+						known_labels = known_labels)
 	return(fit)  	
 } 

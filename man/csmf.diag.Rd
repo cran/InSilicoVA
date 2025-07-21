@@ -38,14 +38,14 @@ iterations after burnin by default.}
 
 \item{which.sub}{the name of the sub-population to test when there are multiple in the fitted object.}
 
-\item{\dots}{Arguments to be passed to \link{heidel.diag} or
-\link{gelman.diag}}
+\item{\dots}{Arguments to be passed to \link[coda]{heidel.diag} or
+\link[coda]{gelman.diag}}
 }
 \description{
 Produce convergence test for CSMFs from fitted \code{"insilico"} objects.
 }
 \details{
-The tests are performed using \link{heidel.diag} and \link{gelman.diag}
+The tests are performed using \link[coda]{heidel.diag} and \link[coda]{gelman.diag}
 functions in \code{coda} package. The function takes either one or a list of
 output from \code{insilico} function, or only the iteration by CSMF matrix.
 Usually in practice, many causes with very tiny CSMF are hard to converge

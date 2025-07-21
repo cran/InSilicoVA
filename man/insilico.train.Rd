@@ -42,6 +42,7 @@ insilico.train(
   impossible.combination = NULL,
   indiv.CI = NULL,
   CondProbTable = NULL,
+  known_labels = NULL,
   ...
 )
 }
@@ -143,6 +144,8 @@ re-estimating conditional probabilities.}
 \item{indiv.CI}{see \code{\link{insilico}} for more detail.}
 
 \item{CondProbTable}{a data frame of two columns: one alphabetic level of the CondProb argument and one numerical value corresponding to the numerical value of each level. Only used when only conditional probabilities are provided instead of training data.}
+
+\item{known_labels}{a data frame with two columns: the first column is the death ID and the second column is the known cause of death (need to match the cause list for the given data format). When it is provided for some causes, they will be used as partial labels in the input data. Any unmatched observations (unmatched by either ID or cause) will not contribute to partial labels. Default to be NULL}
 
 \item{...}{not used}
 }

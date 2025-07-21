@@ -48,6 +48,7 @@ insilico.fit(
   nlevel.dev = NULL,
   indiv.CI = NULL,
   groupcode = FALSE,
+  known_labels = NULL,
   ...
 )
 }
@@ -137,6 +138,8 @@ insilico.fit(
 \item{indiv.CI}{credible interval for individual probabilities}
 
 \item{groupcode}{logical indicator of including the group code in the output causes}
+
+\item{known_labels}{a data frame with two columns: the first column is the death ID and the second column is the known cause of death (need to match the cause list for the given data format). When it is provided for some causes, they will be used as partial labels in the input data. Any unmatched observations (unmatched by either ID or cause) will not contribute to partial labels. Default to be NULL}
 
 \item{...}{unused arguments}
 }

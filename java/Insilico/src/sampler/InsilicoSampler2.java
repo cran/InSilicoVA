@@ -603,6 +603,7 @@ public class InsilicoSampler2 {
      * seed, N_gibbs, thin: integers
      * mu: vector initialized in R
      * sigma2: value initialized in R
+     * 2025 update: known_cause is a N vector \in {1, ..., C} 
      */
     public static double[] Fit(int[] dimensions,
                                double[][] probbase, double[][] probbase_order, double[] level_values,
@@ -612,7 +613,8 @@ public class InsilicoSampler2 {
                                double[] mu, double sigma2, boolean this_is_Unix, boolean useProbbase,
                                boolean isAdded,
                                double[][] mu_continue, double[] sigma2_continue, double[][] theta_continue,
-                               int C_phy, double[] broader, double[][] assignment, int[][] impossible){
+                               int C_phy, double[] broader, double[][] assignment, int[][] impossible, 
+                                     int[] known_cause){
 //			public static void main(String[] args){
 //				int N = 5;
 //				int S = 3;
@@ -747,6 +749,13 @@ public class InsilicoSampler2 {
                         zero_matrix[i][impossible[k][0] - 1] = 0;
                     }
                 }
+            }
+        }
+        for(int i = 0; i < N; i++){
+            if(known_cause[i] > 0){
+                for(int c = 0; c < C; c++){
+                    if(c != known_cause[i] - 1) zero_matrix[i][c] = 0;
+                }                
             }
         }
         // check if specific causes are impossible for a whole subpopulation

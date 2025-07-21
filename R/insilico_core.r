@@ -49,6 +49,7 @@
 #' @param nlevel.dev number of levels in \code{probbase.dev}. Default to be NULL
 #' @param indiv.CI credible interval for individual probabilities
 #' @param groupcode logical indicator of including the group code in the output causes
+#' @param known_labels a data frame with two columns: the first column is the death ID and the second column is the known cause of death (need to match the cause list for the given data format). When it is provided for some causes, they will be used as partial labels in the input data. Any unmatched observations (unmatched by either ID or cause) will not contribute to partial labels. Default to be NULL
 #' @param ... unused arguments
 
 #' @return 
@@ -65,7 +66,7 @@
 #' @keywords InSilicoVA
 #' 
 #' @export insilico.fit
-insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL, isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = c("subset2", "subset", "all", "InterVA", "none")[1], impossible.combination = NULL, no.is.missing = FALSE, customization.dev = FALSE, Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, groupcode=FALSE, ...){ 
+insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NULL, isNumeric = FALSE, updateCondProb = TRUE, keepProbbase.level = TRUE,  CondProb = NULL, CondProbNum = NULL, datacheck = TRUE, datacheck.missing = TRUE, warning.write = FALSE, directory = NULL, external.sep = TRUE, Nsim = 4000, thin = 10, burnin = 2000, auto.length = TRUE, conv.csmf = 0.02, jump.scale = 0.1, levels.prior = NULL, levels.strength = 1, trunc.min = 0.0001, trunc.max = 0.9999, subpop = NULL, java_option = "-Xmx1g", seed = 1, phy.code = NULL, phy.cat = NULL, phy.unknown = NULL, phy.external = NULL, phy.debias = NULL, exclude.impossible.cause = c("subset2", "subset", "all", "InterVA", "none")[1], impossible.combination = NULL, no.is.missing = FALSE, customization.dev = FALSE, Probbase_by_symp.dev = FALSE, probbase.dev = NULL, table.dev = NULL, table.num.dev = NULL, gstable.dev = NULL, nlevel.dev = NULL, indiv.CI = NULL, groupcode=FALSE, known_labels = NULL, ...){ 
   # handling changes throughout time
   args <- as.list(match.call())
   if(!is.null(args$length.sim)){
@@ -75,7 +76,7 @@ insilico.fit <- function(data, data.type = c("WHO2012", "WHO2016")[1], sci = NUL
   data.type <- toupper(data.type)
 
   if(!datacheck && data.type == "WHO2016"){
-  	warning("Data check is turned off. Please be very careful with this, because some indicators needs to be negated in the data check steps (i.e., having symptom = Yes turned into not having symptom = No). Failed to properly negate all such symptoms will lead to erroneous inference.")
+  	warning("Data check is turned off. Please be very careful with this, because some indicators needs to be negated in the data check steps (i.e., having symptom = Yes turned into not having symptom = No). Failure to properly negate all such symptoms will lead to erroneous inference.")
   }
 
   ## Add java system check
@@ -541,7 +542,7 @@ removeExt <- function(data, prob.orig, is.Numeric, subpop, subpop_order_list, ex
 				ext.csmf = ext.csmf))
 }
 
-removeExtV5 <- function(data, prob.orig, csmf.orig, is.Numeric, subpop, subpop_order_list, external.causes, external.symps, nagete){
+removeExtV5 <- function(data, prob.orig, csmf.orig, is.Numeric, subpop, subpop_order_list, external.causes, external.symps, negate){
 ###########################################################
 # function to remove external causes/symps and assign deterministic deaths
 # @param:
@@ -904,22 +905,22 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 	    count.changelabel = 0
 	    for(i in 1:length(valabels)){
 	        if(tolower(colnames(data)[i]) != tolower(valabels)[i]){
-	            warning(paste("Input columne '", colnames(data)[i], "' does not match InterVA standard: '", 
+	            warning(paste("Input column '", colnames(data)[i], "' does not match InterVA standard: '", 
 	                    valabels[i], "'", sep = ""),
 	                    call. = FALSE, immediate. = TRUE)
 	            count.changelabel = count.changelabel + 1
 	        }         
 	    }
 	    if(count.changelabel > 0){
-	        warning(paste(count.changelabel, "column names changed in input. \n If the change in undesirable, please change in the input to match standard InterVA4 input format.\n"), call. = FALSE, immediate. = TRUE)
+	        warning(paste(count.changelabel, "column names changed in input. \n If the change is undesirable, please change the input to match standard InterVA4 input format.\n"), call. = FALSE, immediate. = TRUE)
 	        colnames(data) <- valabels
 	    }
 
 	  	if(!is.null(CondProb)){
 	  		prob.orig <- CondProb
 	  		exclude.impossible.cause <- "none"
-	  		vacauses <- colnames(CondProbNum)
-	  		if(is.null(vacauses)) vacauses <- paste0("Cause", 1:dim(CondProbNum)[2])	  	
+	  		vacauses <- colnames(CondProb)
+	  		if(is.null(vacauses)) vacauses <- paste0("Cause", 1:dim(CondProb)[2])	  	
 	  	}
 	  	if(!is.null(CondProbNum)){
 	  		prob.orig <- CondProbNum 
@@ -1243,7 +1244,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 			ss <- match(impossible.combination[ii, 1], colnames(data)[-1])
 			cc <- match(impossible.combination[ii, 2], colnames(prob.orig))
 			if((!is.na(ss)) && (!is.na(cc))){
-					impossible <- rbind(impossible, c(as.integer(cc), as.integer(ss)))
+					impossible <- rbind(impossible, c(as.integer(cc), as.integer(ss), as.integer(impossible.combination[ii, 3])))
 			}
 		}
 	}else{
@@ -1398,6 +1399,15 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 			indic[temp.ind, i] <- 1
 		}
 	}
+	known_cause <- rep(-1, N)
+	if(!is.null(known_labels)){
+		for(i in 1:dim(known_labels)[1]){
+			j <- match(known_labels[i, 1], data[, 1])
+			k <- match(known_labels[i, 2], vacauses.current)
+			if(!is.na(j)) known_cause[j] <- k
+		}
+  }
+
 	## if data contains missing ".", translate to -1
 	if(isNumeric){
 		contains.missing <- (length(which(data == "-1"))> 0)
@@ -1551,6 +1561,8 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
     sigma2.last.j <- .jarray(rep(0, N_sub.j), dispatch = TRUE)
 	theta.last.j <- .jarray(matrix(0, N_sub.j, C), dispatch = TRUE)
 	keepProb.j <- !updateCondProb
+	known_cause.j <- .jarray(as.integer(known_cause), dispatch = TRUE)
+
 
 	ins <- try( 
 		.jcall(obj, "[D", "Fit", 
@@ -1561,7 +1573,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 		seed.j, N_gibbs.j, burn.j, thin.j, 
 		mu.j, sigma2.j, isUnix, keepProb.j, 
 		isAdded, mu.last.j, sigma2.last.j, theta.last.j, 
-		C.phy.j, vacauses.broader.j, assignment.j, impossible.j) 
+		C.phy.j, vacauses.broader.j, assignment.j, impossible.j, known_cause.j) 
 		, FALSE)
 	if(is(ins, "try-error")){
 		java_message()	
@@ -1616,7 +1628,7 @@ ParseResult <- function(N_sub.j, C.j, S.j, N_level.j, pool.j, fit){
 						seed.j, N_gibbs.j, burn.j, thin.j, 
 						mu.j, sigma2.j, isUnix, keepProb.j, 
 						TRUE, mu.last.j, sigma2.last.j, theta.last.j, 
-						C.phy.j, vacauses.broader.j, assignment.j, impossible.j)
+						C.phy.j, vacauses.broader.j, assignment.j, impossible.j, known_cause.j)
     		# one dimensional array is straightforward
     		fit.add <- ins
     		# fit.add <-  t(sapply(ins, .jevalArray))
